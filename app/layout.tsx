@@ -1,18 +1,28 @@
 import type { Metadata, Viewport } from 'next';
-import Link from 'next/link';
+import { Outfit } from 'next/font/google';
 import './globals.css';
-import MobileNav from '@/components/MobileNav';
+import Navbar from '@/components/Navbar';
+import BackgroundEffects from '@/components/BackgroundEffects';
+import ProgressBar from '@/components/ProgressBar';
+import { Suspense } from 'react';
+
+const outfit = Outfit({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
 
 export const metadata: Metadata = {
-  title: 'AniPocket - Watch Anime Online',
-  description: 'Stream your favorite anime in HD quality. Watch the latest episodes of popular anime series.',
-  keywords: ['anime', 'streaming', 'watch anime', 'anime online', 'free anime'],
+  title: 'AniPocket - Next Gen Anime Streaming',
+  description: 'Experience anime like never before. Ad-free, HD quality, and beautifully designed.',
+  keywords: ['anime', 'streaming', 'watch anime', 'anime online', 'free anime', 'premium'],
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  themeColor: '#0a0a0b',
 };
 
 export default function RootLayout({
@@ -21,69 +31,73 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${outfit.variable} scroll-smooth`}>
       <head>
         <link rel="preconnect" href="https://megaplay.buzz" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://megaplay.buzz" />
         <link rel="preconnect" href="https://proxy.animo.qzz.io" crossOrigin="anonymous" />
       </head>
-      <body className="antialiased">
-        {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/95 backdrop-blur-sm border-b border-[var(--border)]">
-          <div className="container">
-            <div className="flex items-center justify-between h-16">
-              {/* Logo */}
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-[var(--accent)] rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+      <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
+        {/* Cinematic Background */}
+        <BackgroundEffects />
+        
+        {/* Navigation Progress Bar */}
+        <Suspense fallback={null}>
+          <ProgressBar />
+        </Suspense>
+
+        {/* UI Layer */}
+        <div className="relative z-10 flex flex-col min-h-screen">
+          <Navbar />
+
+          <main className="flex-grow">
+            {children}
+          </main>
+
+          <footer className="border-t border-white/5 py-12 mt-12 bg-black/40 backdrop-blur-xl">
+            <div className="container">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div className="col-span-1 md:col-span-2">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-tr from-[var(--accent)] to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-[var(--accent)]/20">
+                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                    <span className="text-2xl font-bold tracking-tight">AniPocket</span>
+                  </div>
+                  <p className="text-[var(--text-muted)] text-sm max-w-sm leading-relaxed">
+                    The next generation of anime streaming. Built for fans who appreciate quality, speed, and aesthetics.
+                  </p>
                 </div>
-                <span className="text-xl font-bold">AniPocket</span>
-              </Link>
-
-              {/* Desktop Nav */}
-              <nav className="hidden md:flex items-center gap-6">
-                <Link href="/" className="text-[var(--text-secondary)] hover:text-white text-sm font-medium">
-                  Home
-                </Link>
-                <Link href="/search" className="text-[var(--text-secondary)] hover:text-white text-sm font-medium">
-                  Browse
-                </Link>
-                <Link href="/search" className="btn btn-primary text-sm py-2 px-4">
-                  Search
-                </Link>
-              </nav>
-
-              {/* Mobile Nav */}
-              <MobileNav />
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="pt-16 min-h-screen">
-          {children}
-        </main>
-
-        {/* Footer */}
-        <footer className="border-t border-[var(--border)] py-8 mt-12">
-          <div className="container">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-[var(--accent)] rounded flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+                
+                <div>
+                  <h4 className="font-semibold mb-4 text-white">Explore</h4>
+                  <ul className="space-y-2 text-sm text-[var(--text-muted)]">
+                    <li><a href="/" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Home</a></li>
+                    <li><a href="/search?sort=trending" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Trending</a></li>
+                    <li><a href="/search?type=movie" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Movies</a></li>
+                  </ul>
                 </div>
-                <span className="font-semibold">AniPocket</span>
+
+                <div>
+                  <h4 className="font-semibold mb-4 text-white">Info</h4>
+                  <ul className="space-y-2 text-sm text-[var(--text-muted)]">
+                    <li><span className="cursor-not-allowed hover:text-white transition-colors">DMCA</span></li>
+                    <li><span className="cursor-not-allowed hover:text-white transition-colors">Terms</span></li>
+                    <li><span className="cursor-not-allowed hover:text-white transition-colors">Privacy</span></li>
+                  </ul>
+                </div>
               </div>
-              <p className="text-[var(--text-muted)] text-sm">
-                © 2024 AniPocket. For educational purposes only.
-              </p>
+              
+              <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="text-[var(--text-muted)] text-xs">
+                  © {new Date().getFullYear()} AniPocket. Non-commercial project.
+                </p>
+              </div>
             </div>
-          </div>
-        </footer>
+          </footer>
+        </div>
       </body>
     </html>
   );

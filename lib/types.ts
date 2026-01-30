@@ -3,7 +3,9 @@
 export interface Anime {
     id: string;
     title: string;
-    image: string;
+    image: string; // Used as banner for spotlight, or poster for others
+    poster?: string; // Specific vertical poster (derived from banner for spotlight)
+    rank?: number; // Rank for trending list
     type?: string;
     episodes?: {
         sub?: number;
