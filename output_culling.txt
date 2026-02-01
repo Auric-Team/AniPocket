@@ -1,0 +1,5 @@
+Directly checking Anime ID: jujutsu-kaisen-the-culling-game-part-1-20401
+[AniPocket] Getting details for: jujutsu-kaisen-the-culling-game-part-1-20401
+Checking Episode 1 ID: 162345
+Servers found: { sub: true, dub: true }
+SUCCESS: Dub detected correctly.

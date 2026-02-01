@@ -1,0 +1,7 @@
+Searching for Naruto...
+[AniPocket] Searching for: Naruto
+Found Anime: Road of Naruto ID: road-of-naruto-18220
+[AniPocket] Getting details for: road-of-naruto-18220
+Checking Episode 1 ID: 94736
+Servers found: { sub: true, dub: false }
+WARNING: Dub NOT detected (unexpected for Naruto).

@@ -1,0 +1,7 @@
+Searching for Jujutsu Kaisen...
+[AniPocket] Searching for: Jujutsu Kaisen
+Found Anime: Jujutsu Kaisen 2nd Season ID: jujutsu-kaisen-2nd-season-18413
+[AniPocket] Getting details for: jujutsu-kaisen-2nd-season-18413
+Checking Episode 1 ID: 102662
+Servers found: { sub: true, dub: true }
+SUCCESS: Dub detected correctly.

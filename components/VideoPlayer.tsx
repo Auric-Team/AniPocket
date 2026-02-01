@@ -57,51 +57,52 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
                     )}
                 </div>
 
-                {/* Controls */}
-                <div className="flex items-center gap-2">
-                    {/* Language Toggle - Only show if DUB is available */}
-                    {hasDub ? (
-                        <div className="flex rounded-lg overflow-hidden border border-[var(--border)]">
-                            <button
-                                onClick={() => { setLanguage('sub'); setIsLoading(true); }}
-                                className={`px-4 py-2 text-sm font-medium transition-colors ${language === 'sub'
-                                    ? 'bg-[var(--accent)] text-white'
-                                    : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
-                                    }`}
-                            >
-                                SUB
-                            </button>
-                            <button
-                                onClick={() => { setLanguage('dub'); setIsLoading(true); }}
-                                className={`px-4 py-2 text-sm font-medium transition-colors ${language === 'dub'
-                                    ? 'bg-[var(--accent)] text-white'
-                                    : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
-                                    }`}
-                            >
-                                DUB
-                            </button>
-                        </div>
-                    ) : (
-                        <span className="px-4 py-2 text-sm font-medium bg-[var(--bg-card)] border border-[var(--border)] rounded-lg text-[var(--text-secondary)]">
-                            SUB Only
-                        </span>
-                    )}
 
-                    {/* Theater Mode */}
+                {/* Persistent Language Toggle */}
+                <div className="flex items-center gap-1 bg-[#1a1a1c] rounded-xl p-1.5 border border-white/10 shadow-inner">
                     <button
-                        onClick={() => setIsTheaterMode(!isTheaterMode)}
-                        className="p-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-hover)] transition-colors"
-                        title={isTheaterMode ? 'Exit theater mode' : 'Theater mode'}
+                        onClick={() => { setLanguage('sub'); setIsLoading(true); }}
+                        className={`relative px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${language === 'sub'
+                            ? 'bg-gradient-to-r from-[var(--accent)] to-[#8b5cf6] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]'
+                            : 'text-[var(--text-secondary)] hover:text-white hover:bg-white/5'
+                            }`}
                     >
-                        <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            {isTheaterMode ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                            )}
-                        </svg>
+                        SUB
+                    </button>
+                    <button
+                        onClick={() => { if (hasDub) { setLanguage('dub'); setIsLoading(true); } }}
+                        disabled={!hasDub}
+                        className={`relative px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${language === 'dub'
+                            ? 'bg-gradient-to-r from-[var(--accent)] to-[#8b5cf6] text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]'
+                            : hasDub
+                                ? 'text-[var(--text-secondary)] hover:text-white hover:bg-white/5'
+                                : 'text-white/20 cursor-not-allowed decoration-slice'
+                            }`}
+                        title={hasDub ? "Switch to Dub" : "Dub not available"}
+                    >
+                        DUB
+                        {!hasDub && (
+                            <span className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 text-[10px] text-white rounded whitespace-nowrap">
+                                Not Available
+                            </span>
+                        )}
                     </button>
                 </div>
+
+                {/* Theater Mode */}
+                <button
+                    onClick={() => setIsTheaterMode(!isTheaterMode)}
+                    className="p-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-hover)] transition-colors"
+                    title={isTheaterMode ? 'Exit theater mode' : 'Theater mode'}
+                >
+                    <svg className="w-5 h-5 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {isTheaterMode ? (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        ) : (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                        )}
+                    </svg>
+                </button>
             </div>
 
             {/* Video Info */}

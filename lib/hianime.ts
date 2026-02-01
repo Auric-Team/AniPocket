@@ -66,7 +66,7 @@ export async function getSpotlightAnime(): Promise<Anime[]> {
             const $el = $(el);
             const $content = $el.find('.deslide-item-content');
             const $img = $el.find('.film-poster-img');
-            
+
             const watchLink = $content.find('.desi-buttons a').last().attr('href');
             const id = watchLink?.split('/').pop()?.split('?')[0] || '';
 
@@ -74,7 +74,7 @@ export async function getSpotlightAnime(): Promise<Anime[]> {
                 const subText = $content.find('.tick-sub').text().trim();
                 const dubText = $content.find('.tick-dub').text().trim();
                 const bannerImage = $img.attr('data-src') || $img.attr('src') || '';
-                
+
                 // Use robust regex replacer
                 const posterImage = toPosterUrl(bannerImage);
 
@@ -109,18 +109,18 @@ export async function getTrendingAnime(): Promise<Anime[]> {
 
         $('#trending-home .swiper-slide').each((i, el) => {
             const $el = $(el);
-            
+
             // FIX: The anchor tag IS the .film-poster element, not a child of it
             let $link = $el.find('.film-poster');
             if ($link.length === 0 || !$link.is('a')) {
-                 // Fallback: try finding 'a' inside if structure changes
-                 $link = $el.find('.film-poster a');
+                // Fallback: try finding 'a' inside if structure changes
+                $link = $el.find('.film-poster a');
             }
-            
+
             const $img = $el.find('img'); // Just find any img inside
-            
+
             const id = $link.attr('href')?.split('/').pop()?.split('?')[0] || '';
-            
+
             const rank = parseInt($el.find('.number span').text().trim()) || i + 1;
             const title = $el.find('.film-title').text().trim() || $el.find('.dynamic-name').text().trim();
             const image = $img.attr('data-src') || $img.attr('src') || '';
@@ -135,7 +135,7 @@ export async function getTrendingAnime(): Promise<Anime[]> {
                 });
             }
         });
-        
+
         console.log(`[AniPocket] Found ${anime.length} trending items`);
         return anime;
     } catch (error) {
@@ -291,5 +291,23 @@ export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | n
     } catch (error) {
         console.error('[AniPocket] Error fetching details:', error);
         return null;
+    }
+}
+
+// Check episode server availability
+export async function getEpisodeServers(episodeId: string): Promise<{ sub: boolean; dub: boolean }> {
+    try {
+        const ajaxUrl = `${PROXY_BASE}/?url=${encodeURIComponent(`${HIANIME_URL}/ajax/v2/episode/servers?episodeId=${episodeId}`)}`;
+        const { data } = await client.get(ajaxUrl);
+        const html = typeof data === 'string' ? data : data.html || '';
+        const $ = cheerio.load(html);
+
+        const sub = $('.item.server-item[data-type="sub"]').length > 0;
+        const dub = $('.item.server-item[data-type="dub"]').length > 0;
+
+        return { sub, dub };
+    } catch (error) {
+        console.error('[AniPocket] Error fetching servers:', error);
+        return { sub: false, dub: false };
     }
 }
