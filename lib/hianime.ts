@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio';
 import { Anime, AnimeDetails, Episode } from './types';
 
 // Proxy configuration
-const PROXY_BASE = 'https://proxy.animo.qzz.io';
+const PROXY_BASE = 'https://vercel-proxy-kappa-nine.vercel.app';
 const HIANIME_URL = 'https://hianime.to';
 
 // Helper to create proxied URL
