@@ -4,12 +4,12 @@ import * as cheerio from 'cheerio';
 import { Anime, AnimeDetails, Episode } from './types';
 
 // Proxy configuration
-const PROXY_BASE = 'https://vercel-proxy-kappa-nine.vercel.app';
+const PROXY_BASE = 'https://cors.eu.org';
 const HIANIME_URL = 'https://hianime.to';
 
 // Helper to create proxied URL
 function proxyUrl(path: string): string {
-    return `${PROXY_BASE}/?url=${encodeURIComponent(`${HIANIME_URL}${path}`)}`;
+    return `${PROXY_BASE}/${HIANIME_URL}${path}`;
 }
 
 // Helper to convert any HiAnime image URL to a 300x400 poster
@@ -257,7 +257,7 @@ export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | n
 
         let episodes: Episode[] = [];
         if (dataId) {
-            const ajaxUrl = `${PROXY_BASE}/?url=${encodeURIComponent(`${HIANIME_URL}/ajax/v2/episode/list/${dataId}`)}`;
+            const ajaxUrl = `${PROXY_BASE}/${HIANIME_URL}/ajax/v2/episode/list/${dataId}`;
             const { data: epData } = await client.get(ajaxUrl);
             const epHtml = typeof epData === 'string' ? epData : epData.html || '';
             const $eps = cheerio.load(epHtml);
@@ -297,7 +297,7 @@ export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | n
 // Check episode server availability
 export async function getEpisodeServers(episodeId: string): Promise<{ sub: boolean; dub: boolean }> {
     try {
-        const ajaxUrl = `${PROXY_BASE}/?url=${encodeURIComponent(`${HIANIME_URL}/ajax/v2/episode/servers?episodeId=${episodeId}`)}`;
+        const ajaxUrl = `${PROXY_BASE}/${HIANIME_URL}/ajax/v2/episode/servers?episodeId=${episodeId}`;
         const { data } = await client.get(ajaxUrl);
         const html = typeof data === 'string' ? data : data.html || '';
         const $ = cheerio.load(html);

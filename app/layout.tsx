@@ -35,7 +35,7 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://megaplay.buzz" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://megaplay.buzz" />
-        <link rel="preconnect" href="https://proxy.animo.qzz.io" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cors.eu.org" crossOrigin="anonymous" />
       </head>
       <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
         {/* Cinematic Background */}

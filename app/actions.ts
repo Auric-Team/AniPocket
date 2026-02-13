@@ -3,11 +3,11 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-const PROXY_BASE = 'https://vercel-proxy-kappa-nine.vercel.app';
+const PROXY_BASE = 'https://cors.eu.org';
 const HIANIME_URL = 'https://hianime.to';
 
 function proxyUrl(path: string): string {
-    return `${PROXY_BASE}/?url=${encodeURIComponent(`${HIANIME_URL}${path}`)}`;
+    return `${PROXY_BASE}/${HIANIME_URL}${path}`;
 }
 
 export interface Server {
