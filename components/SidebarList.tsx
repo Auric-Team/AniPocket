@@ -21,12 +21,11 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
                 </h2>
             </div>
 
-            <div className="bg-[var(--bg-secondary)] rounded-tl-none rounded-tr-lg rounded-b-lg">
-                {/* HiAnime Top Tab styling mock */}
-                <div className="flex border-b border-[#2b2b31]">
-                    <button className="px-4 py-2 text-sm font-semibold text-[var(--accent)] border-b-2 border-[var(--accent)] bg-[#2b2b31]/50">Today</button>
-                    <button className="px-4 py-2 text-sm font-medium text-[#aaaaaa] hover:text-white transition-colors">Week</button>
-                    <button className="px-4 py-2 text-sm font-medium text-[#aaaaaa] hover:text-white transition-colors">Month</button>
+            <div className="bg-[#18181b] rounded-xl border border-white/5 overflow-hidden shadow-lg">
+                <div className="flex border-b border-white/5">
+                    <button className="flex-1 py-3 text-sm font-bold text-[#FFB000] border-b-2 border-[#FFB000] bg-[#27272a]/50 transition-colors">Today</button>
+                    <button className="flex-1 py-3 text-sm font-medium text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">Week</button>
+                    <button className="flex-1 py-3 text-sm font-medium text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">Month</button>
                 </div>
 
                 <div className="flex flex-col">
@@ -34,13 +33,12 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
                         <Link
                             key={anime.id}
                             href={`/watch/${anime.id}`}
-                            className="group flex flex-col md:flex-row items-center p-3 border-b border-[#2b2b31] last:border-0 hover:bg-[#ffffff05] transition-colors"
+                            className="group flex flex-col md:flex-row items-center p-3 border-b border-white/5 last:border-0 hover:bg-[#ffffff05] transition-colors"
                         >
-                            {/* HiAnime Flat Bold Numbers */}
-                            <div className="w-10 shrink-0 flex items-center justify-center border-r border-[#2b2b31] mr-3">
-                                <span className={`text-xl font-bold ${index === 0 ? 'text-[var(--accent)]' :
-                                    index === 1 ? 'text-[#3db4f2]' :
-                                        index === 2 ? 'text-[#f3be53]' : 'text-white'
+                            <div className="w-10 shrink-0 flex items-center justify-center mr-2">
+                                <span className={`text-2xl font-black font-outfit ${index === 0 ? 'text-[#FFB000]' :
+                                    index === 1 ? 'text-[#FF5E00]' :
+                                        index === 2 ? 'text-[#e5c786]' : 'text-zinc-600'
                                     }`}>
                                     {index + 1}
                                 </span>
@@ -48,37 +46,42 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
 
                             <div className="flex items-center w-full gap-3">
                                 {/* Thin Poster */}
-                                <div className="relative w-12 h-16 shrink-0 rounded bg-[#242428] overflow-hidden">
+                                <div className="relative w-14 h-20 shrink-0 rounded-md bg-[#27272a] overflow-hidden shadow-sm">
                                     <Image
                                         src={anime.image}
                                         alt={anime.title}
                                         fill
-                                        className="object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                                        className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
                                         unoptimized
                                     />
                                 </div>
 
                                 {/* Stacked Meta Data */}
                                 <div className="flex flex-col min-w-0 flex-1 justify-center">
-                                    <h4 className="text-sm font-semibold text-[#f9f9f9] group-hover:text-[var(--accent)] transition-colors line-clamp-1 mb-1.5">
+                                    <h4 className="text-[15px] font-semibold text-[#f4f4f5] group-hover:text-[#FFB000] transition-colors line-clamp-2 leading-snug mb-1.5">
                                         {anime.title}
                                     </h4>
 
-                                    <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-[#888]">
-                                        <div className="flex items-center gap-1 bg-[#242428] px-1.5 rounded text-[#aaaaaa]">
-                                            <svg className="w-3 h-3 text-[#aaaaaa]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5 5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" /></svg>
-                                            {Math.floor(Math.random() * 90) + 10}K
-                                        </div>
-                                        {anime.episodes?.sub && (
-                                            <div className="flex items-center gap-0.5 text-xs">
-                                                <span className="bg-[var(--badge-sub)] text-black px-1 rounded-sm leading-tight flex items-center">
-                                                    <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z" /></svg>
-                                                    {anime.episodes.sub}
-                                                </span>
+                                    <div className="flex flex-wrap items-center gap-2 text-[12px] font-medium text-[#a1a1aa]">
+                                        <span>{anime.type || 'TV'}</span>
+                                        <span className="w-1 h-1 rounded-full bg-[#52525b]" />
+
+                                        {(anime.episodes?.sub || anime.episodes?.dub) && (
+                                            <div className="flex items-center gap-1.5">
+                                                {anime.episodes.sub && (
+                                                    <div className="flex items-center text-[#ffdd95]">
+                                                        <span className="font-bold border border-[#ffdd95]/30 bg-[#ffdd95]/10 px-1 rounded text-[10px]">SUB</span>
+                                                        <span className="ml-1 text-[#f4f4f5]">{anime.episodes.sub}</span>
+                                                    </div>
+                                                )}
+                                                {anime.episodes.dub && (
+                                                    <div className="flex items-center text-[#e3b5cd]">
+                                                        <span className="font-bold border border-[#e3b5cd]/30 bg-[#e3b5cd]/10 px-1 rounded text-[10px]">DUB</span>
+                                                        <span className="ml-1 text-[#f4f4f5]">{anime.episodes.dub}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
-                                        <div className="w-1 h-1 bg-[#888] rounded-full mx-1" />
-                                        <span>{anime.type || 'TV'}</span>
                                     </div>
                                 </div>
                             </div>

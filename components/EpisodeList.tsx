@@ -39,7 +39,7 @@ export default function EpisodeList({ episodes, animeId, currentEpisodeId }: Epi
             if (index !== -1) {
                 const newRange = Math.floor(index / CHUNK_SIZE);
                 if (newRange !== rangeIndex) {
-                    setRangeIndex(newRange);
+                    setTimeout(() => setRangeIndex(newRange), 0);
                 }
             }
         }
@@ -81,8 +81,8 @@ export default function EpisodeList({ episodes, animeId, currentEpisodeId }: Epi
                                     key={idx}
                                     onClick={() => setRangeIndex(idx)}
                                     className={`px-3 py-1.5 text-xs font-semibold tracking-wide rounded transition-colors ${rangeIndex === idx
-                                            ? 'bg-white text-black'
-                                            : 'bg-[#3b3b42] text-white hover:bg-white hover:text-black'
+                                        ? 'bg-white text-black'
+                                        : 'bg-[#3b3b42] text-white hover:bg-white hover:text-black'
                                         }`}
                                 >
                                     EPS: {start.toString().padStart(3, '0')}-{end.toString().padStart(3, '0')}

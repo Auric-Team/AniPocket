@@ -1,0 +1,62 @@
+$ eslint
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\app\search\page.tsx
+  94:92   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  94:100  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\app\watch\[id]\page.tsx
+  131:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\components\ContinueWatchingClient.tsx
+  26:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\components\Hero.tsx
+  3:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\components\Navbar.tsx
+  109:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\components\SidebarList.tsx
+  13:57  warning  'viewAllLink' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\components\WatchProgressTracker.tsx
+  27:8  warning  React Hook useEffect has a missing dependency: 'addToHistory'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\hooks\useWatchHistory.ts
+  21:22  warning  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  25:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\hooks\useWatchHistory.ts:25:9
+  23 |             }
+  24 |         }
+> 25 |         setIsLoaded(true);
+     |         ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  26 |     }, []);
+  27 |
+  28 |     const addToHistory = (item: Omit<WatchHistoryItem, 'timestamp'>) => {  react-hooks/set-state-in-effect
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\lib\data.ts
+  160:30  warning  'episodeList' is defined but never used    @typescript-eslint/no-unused-vars
+  160:43  warning  'totalEpisodes' is defined but never used  @typescript-eslint/no-unused-vars
+  173:17  warning  'episodeList' is defined but never used    @typescript-eslint/no-unused-vars
+  173:30  warning  'totalEpisodes' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Abhi\OneDrive\Desktop\AniPocket\lib\hianime.ts
+  157:14  warning  'error' is defined but never used                    @typescript-eslint/no-unused-vars
+  169:14  warning  'error' is defined but never used                    @typescript-eslint/no-unused-vars
+  181:14  warning  'error' is defined but never used                    @typescript-eslint/no-unused-vars
+  193:14  warning  'error' is defined but never used                    @typescript-eslint/no-unused-vars
+  205:14  warning  'error' is defined but never used                    @typescript-eslint/no-unused-vars
+  231:14  warning  'error' is defined but never used                    @typescript-eslint/no-unused-vars
+  261:13  error    'episodes' is never reassigned. Use 'const' instead  prefer-const
+
+Γ£û 21 problems (4 errors, 17 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
+error: script "lint" exited with code 1

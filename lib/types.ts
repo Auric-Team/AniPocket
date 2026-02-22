@@ -35,3 +35,19 @@ export interface SearchResult {
     hasNextPage: boolean;
     currentPage: number;
 }
+
+export interface AdvancedSearchFilters {
+    keyword?: string;
+    type?: string;
+    status?: string;
+    sort?: string;
+    genres?: string;
+    page?: number;
+}
+
+export interface PageResult<T> {
+    animes: T[];
+    totalPages: number;
+    hasNextPage: boolean;
+    currentPage: number;
+}

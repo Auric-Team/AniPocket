@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import VideoPlayer from '@/components/VideoPlayer';
 import EpisodeList from '@/components/EpisodeList';
 import SynopsisText from '@/components/SynopsisText';
+import WatchProgressTracker from '@/components/WatchProgressTracker';
 import { getAnimeDetails, getEpisodeServers } from '@/lib/hianime';
 
 export default async function WatchPage({
@@ -27,7 +28,7 @@ export default async function WatchPage({
             <div className="min-h-screen flex items-center justify-center bg-[#0b0c0f]">
                 <div className="p-8 rounded bg-[#1e1e24] text-center max-w-md border border-white/5">
                     <h2 className="text-xl font-bold text-white mb-2">No Episodes Found</h2>
-                    <p className="text-[#888] text-sm mb-6">We couldn't find any episodes for this anime.</p>
+                    <p className="text-[#888] text-sm mb-6">We couldn&apos;t find any episodes for this anime.</p>
                     <Link href="/" className="bg-[var(--accent)] text-[#111] px-6 py-2 rounded font-bold text-sm">Return Home</Link>
                 </div>
             </div>
@@ -58,6 +59,15 @@ export default async function WatchPage({
                     </nav>
                 </div>
             </div>
+
+            {/* Invisible Watch History Tracker */}
+            <WatchProgressTracker
+                animeId={anime.id}
+                animeTitle={anime.title}
+                animeImage={anime.image}
+                episodeId={currentEpId}
+                episodeNumber={episodeNumber}
+            />
 
             <div className="container max-w-[1400px] mx-auto px-4 mt-6 pb-12">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">

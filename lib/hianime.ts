@@ -1,7 +1,7 @@
 // HiAnime.to data provider - 100% realtime data via proxy
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { Anime, AnimeDetails, Episode } from './types';
+import { Anime, AnimeDetails, Episode, AdvancedSearchFilters, PageResult } from './types';
 
 // Proxy configuration
 const PROXY_BASE = 'https://cors.eu.org';
@@ -37,17 +37,20 @@ function parseAnimeItems($: cheerio.CheerioAPI, selector: string): Anime[] {
         const $img = $el.find('.film-poster img').first();
         const href = $link.attr('href') || '';
         const id = href.split('/').pop()?.split('?')[0] || '';
-
         if (id && !anime.find(a => a.id === id)) {
+            const type = $el.find('.fdi-item').first().text().trim() || 'TV';
+
+            // Ensure episodes is treated properly
+            const episodes: { sub: number | undefined; dub: number | undefined } = {
+                sub: parseInt($el.find('.tick-sub').text().replace(/\s/g, '')) || undefined,
+                dub: parseInt($el.find('.tick-dub').text().replace(/\s/g, '')) || undefined,
+            };
             anime.push({
                 id,
                 title: $link.attr('title') || $img.attr('alt') || $el.find('.film-name').text().trim() || 'Unknown',
                 image: $img.attr('data-src') || $img.attr('src') || '',
-                type: $el.find('.fdi-type').text().trim() || 'TV',
-                episodes: {
-                    sub: parseInt($el.find('.tick-sub').text()) || undefined,
-                    dub: parseInt($el.find('.tick-dub').text()) || undefined,
-                },
+                type,
+                episodes,
             });
         }
     });
@@ -218,7 +221,7 @@ export async function getAnimeByCategory(category: string): Promise<Anime[]> {
     }
 }
 
-// Search anime
+// Search anime (Basic)
 export async function searchAnimeFromSite(query: string): Promise<Anime[]> {
     try {
         console.log(`[AniPocket] Searching for: ${query}`);
@@ -227,6 +230,53 @@ export async function searchAnimeFromSite(query: string): Promise<Anime[]> {
         return parseAnimeItems($, '.film_list-wrap .flw-item');
     } catch (error) {
         return [];
+    }
+}
+
+// Advanced Search & Filter (Paginated)
+export async function getAdvancedSearchAnime(filters: AdvancedSearchFilters): Promise<PageResult<Anime>> {
+    try {
+        const queryParams = new URLSearchParams();
+        if (filters.keyword) queryParams.append('keyword', filters.keyword);
+        if (filters.type) queryParams.append('type', filters.type);
+        if (filters.status) queryParams.append('status', filters.status);
+        if (filters.sort) queryParams.append('sort', filters.sort);
+        if (filters.genres) queryParams.append('genres', filters.genres);
+        if (filters.page) queryParams.append('page', filters.page.toString());
+
+        const url = `/filter?${queryParams.toString()}`;
+        console.log(`[AniPocket] Fetching advanced search: ${url}`);
+
+        const { data } = await client.get(proxyUrl(url));
+        const $ = cheerio.load(data);
+
+        const animes = parseAnimeItems($, '.film_list-wrap .flw-item');
+
+        let totalPages = 1;
+        let hasNextPage = false;
+        const currentPage = filters.page || 1;
+
+        const $pagination = $('.pagination');
+        if ($pagination.length > 0) {
+            const $lastPage = $pagination.find('a.page-link').not('[title="Next"], [title="Prev"]').last();
+            if ($lastPage.length > 0) {
+                totalPages = parseInt($lastPage.attr('href')?.match(/page=(\d+)/)?.[1] || '1') || 1;
+            }
+            // Check for next button
+            if ($pagination.find('a[title="Next"], a:contains("Next")').length > 0) {
+                hasNextPage = true;
+            }
+        }
+
+        return {
+            animes,
+            totalPages,
+            hasNextPage,
+            currentPage
+        };
+    } catch (error) {
+        console.error('[AniPocket] Error fetching advanced search:', error);
+        return { animes: [], totalPages: 1, hasNextPage: false, currentPage: filters.page || 1 };
     }
 }
 
@@ -255,7 +305,7 @@ export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | n
 
         const dataId = $('[data-id]').first().attr('data-id') || $('.film-buttons a[data-id]').attr('data-id') || '';
 
-        let episodes: Episode[] = [];
+        const episodes: Episode[] = [];
         if (dataId) {
             const ajaxUrl = `${PROXY_BASE}/${HIANIME_URL}/ajax/v2/episode/list/${dataId}`;
             const { data: epData } = await client.get(ajaxUrl);

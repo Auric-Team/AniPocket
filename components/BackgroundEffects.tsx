@@ -1,5 +1,6 @@
 'use client';
 
 export default function BackgroundEffects() {
-  return null; // Removed completely for performance and professional look
+  // Removing the aggressive colored orbs. Returning to a clean, professional dark app background.
+  return null;
 }

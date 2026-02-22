@@ -1,31 +1,27 @@
 @import "tailwindcss";
 
-/* ===== CSS Variables (HiAnime Palette) ===== */
+/* ===== CSS Variables (Premium V3 Palette) ===== */
 :root {
-  /* True HiAnime colors */
-  --bg-primary: #0b0c0f;
-  /* Deep space black body */
-  --bg-secondary: #1e1e24;
-  /* Header/Panel background */
-  --bg-card: #242428;
-  /* Cards and dropdowns */
-  --bg-hover: #ffffff14;
-  /* Subtle hover light */
+  /* Profound Zinc Space */
+  --bg-primary: #09090b;
+  /* zinc-950 */
+  --bg-secondary: #18181b;
+  /* zinc-900 */
+  --bg-card: #27272a;
+  /* zinc-800 */
+  --bg-hover: #ffffff0a;
 
-  /* The iconic HiAnime Yellow/Gold */
-  --accent: #ffdd95;
-  --accent-hover: #e5c786;
-
-  /* Badges */
-  --badge-sub: #b0e3af;
-  /* Light green for Sub */
-  --badge-dub: #e3b5cd;
-  /* Light pink/purple for Dub */
+  /* Electric Brand Gradient */
+  --accent: #FFB000;
+  --accent-hover: #FFC033;
 
   /* Text */
-  --text-primary: #ffffff;
-  --text-secondary: #aaaaaa;
-  --text-muted: #888888;
+  --text-primary: #f4f4f5;
+  /* zinc-100 */
+  --text-secondary: #a1a1aa;
+  /* zinc-400 */
+  --text-muted: #71717a;
+  /* zinc-500 */
 
   --border: #ffffff14;
 }
@@ -33,7 +29,6 @@
 /* ===== Base Styles ===== */
 html {
   scroll-behavior: smooth;
-  /* Use Inter or Poppins for clean streaming look */
   font-family: var(--font-inter), system-ui, sans-serif;
   background: var(--bg-primary);
   text-rendering: optimizeLegibility;
@@ -46,7 +41,6 @@ body {
   color: var(--text-primary);
   overflow-x: hidden;
   font-size: 14px;
-  /* Standardize font size to match HiAnime density */
 }
 
 /* ===== Custom Scrollbar ===== */
@@ -96,6 +90,7 @@ body {
 .line-clamp-1 {
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -103,6 +98,22 @@ body {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ===== Custom Animations for "Impressive" Overhaul ===== */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
 }

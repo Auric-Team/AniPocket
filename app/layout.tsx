@@ -1,16 +1,23 @@
 import type { Metadata, Viewport } from 'next';
-import { Outfit } from 'next/font/google';
+import { Outfit, Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Logo from '@/components/Logo';
 import BackgroundEffects from '@/components/BackgroundEffects';
 import ProgressBar from '@/components/ProgressBar';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 const outfit = Outfit({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-outfit',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
@@ -32,13 +39,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${outfit.variable} scroll-smooth`}>
+    <html lang="en" className={`${outfit.variable} ${inter.variable} scroll-smooth`}>
       <head>
         <link rel="preconnect" href="https://megaplay.buzz" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://megaplay.buzz" />
         <link rel="preconnect" href="https://cors.eu.org" crossOrigin="anonymous" />
       </head>
-      <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
+      <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans overflow-x-hidden selection:bg-[var(--accent)] selection:text-[#09090b]">
         {/* Cinematic Background */}
         <BackgroundEffects />
 
@@ -70,9 +77,9 @@ export default function RootLayout({
                 <div>
                   <h4 className="font-semibold mb-4 text-white">Explore</h4>
                   <ul className="space-y-2 text-sm text-[var(--text-muted)]">
-                    <li><a href="/" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Home</a></li>
-                    <li><a href="/search?sort=trending" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Trending</a></li>
-                    <li><a href="/search?type=movie" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Movies</a></li>
+                    <li><Link href="/" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Home</Link></li>
+                    <li><Link href="/search?sort=trending" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Trending</Link></li>
+                    <li><Link href="/search?type=movie" className="hover:text-[var(--accent)] transition-colors hover:translate-x-1 inline-block duration-200">Movies</Link></li>
                   </ul>
                 </div>
 

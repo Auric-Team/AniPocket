@@ -11,8 +11,10 @@ export default function ProgressBar() {
 
   useEffect(() => {
     // Start progress
-    setIsVisible(true);
-    setProgress(30);
+    setTimeout(() => {
+      setIsVisible(true);
+      setProgress(30);
+    }, 0);
 
     const timer = setTimeout(() => {
       setProgress(70);
@@ -36,7 +38,7 @@ export default function ProgressBar() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] h-0.5 bg-transparent">
-      <div 
+      <div
         className="h-full bg-gradient-to-r from-[var(--accent)] to-purple-500 transition-all duration-300 ease-out shadow-[0_0_10px_var(--accent)]"
         style={{ width: `${progress}%` }}
       />

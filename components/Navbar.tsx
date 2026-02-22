@@ -21,7 +21,7 @@ export default function Navbar() {
 
     // Close mobile menu on route change
     useEffect(() => {
-        setIsMobileMenuOpen(false);
+        setTimeout(() => setIsMobileMenuOpen(false), 0);
     }, [pathname]);
 
     const navLinks = [
@@ -145,8 +145,8 @@ export default function Navbar() {
                                             key={item.name}
                                             href={item.href}
                                             className={`px-4 py-3 rounded-xl text-[14px] font-semibold transition-all ${isActive
-                                                    ? 'bg-[var(--accent)] text-[#111]'
-                                                    : 'text-[#aaaaaa] hover:bg-[#2b2b31] hover:text-white'
+                                                ? 'bg-[var(--accent)] text-[#111]'
+                                                : 'text-[#aaaaaa] hover:bg-[#2b2b31] hover:text-white'
                                                 }`}
                                         >
                                             {item.name}
