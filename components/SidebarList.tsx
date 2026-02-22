@@ -2,7 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Anime } from '@/lib/types';
+
+const MotionLink = motion.create(Link);
 
 interface SidebarListProps {
     title: string;
@@ -14,7 +17,13 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
     if (!animeList || animeList.length === 0) return null;
 
     return (
-        <div className="w-full">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="w-full"
+        >
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-white tracking-wide">
                     {title}
@@ -28,11 +37,27 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
                     <button className="flex-1 py-3 text-sm font-medium text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">Month</button>
                 </div>
 
-                <div className="flex flex-col">
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                            opacity: 1,
+                            transition: { staggerChildren: 0.08 }
+                        }
+                    }}
+                    className="flex flex-col"
+                >
                     {animeList.slice(0, 5).map((anime, index) => (
-                        <Link
+                        <MotionLink
                             key={anime.id}
                             href={`/watch/${anime.id}`}
+                            variants={{
+                                hidden: { opacity: 0, x: -20 },
+                                visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                            }}
                             className="group flex flex-col md:flex-row items-center p-3 border-b border-white/5 last:border-0 hover:bg-[#ffffff05] transition-colors"
                         >
                             <div className="w-10 shrink-0 flex items-center justify-center mr-2">
@@ -85,10 +110,10 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
                                     </div>
                                 </div>
                             </div>
-                        </Link>
+                        </MotionLink>
                     ))}
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
 }

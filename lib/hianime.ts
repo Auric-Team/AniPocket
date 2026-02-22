@@ -222,7 +222,7 @@ export async function getAnimeByCategory(category: string): Promise<Anime[]> {
 }
 
 // Search anime (Basic)
-export async function searchAnimeFromSite(query: string): Promise<Anime[]> {
+export async function searchAnime(query: string): Promise<Anime[]> {
     try {
         console.log(`[AniPocket] Searching for: ${query}`);
         const { data } = await client.get(proxyUrl(`/search?keyword=${encodeURIComponent(query)}`));

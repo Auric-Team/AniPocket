@@ -11,6 +11,7 @@ export interface Anime {
         sub?: number;
         dub?: number;
     };
+    duration?: string;
     rating?: string;
     synopsis?: string;
     genres?: string[];

@@ -24,7 +24,7 @@ export default function WatchProgressTracker({ animeId, animeTitle, animeImage, 
                 episodeNumber
             });
         }
-    }, [animeId, episodeId, animeTitle, animeImage, episodeNumber]);
+    }, [animeId, episodeId, animeTitle, animeImage, episodeNumber, addToHistory]);
 
     return null; // This is purely logical, no UI
 }

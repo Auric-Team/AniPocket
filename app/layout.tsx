@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Logo from '@/components/Logo';
 import BackgroundEffects from '@/components/BackgroundEffects';
 import ProgressBar from '@/components/ProgressBar';
+import PageTransition from '@/components/PageTransition';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -59,7 +60,9 @@ export default function RootLayout({
           <Navbar />
 
           <main className="flex-grow">
-            {children}
+            <PageTransition>
+              {children}
+            </PageTransition>
           </main>
 
           <footer className="border-t border-white/5 py-12 mt-12 bg-black/40 backdrop-blur-xl">

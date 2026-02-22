@@ -2,8 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Anime } from '@/lib/types';
 import { useRef } from 'react';
+
+const MotionLink = motion.create(Link);
 
 interface TrendingListProps {
     animeList: Anime[];
@@ -57,57 +60,70 @@ export default function TrendingList({ animeList }: TrendingListProps) {
                 </div>
 
                 {/* Ultra Clean Horizontal Scroll */}
-                <div
+                <motion.div
                     ref={listRef}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                            opacity: 1,
+                            transition: {
+                                staggerChildren: 0.1
+                            }
+                        }
+                    }}
                     className="flex overflow-x-auto gap-4 md:gap-5 pb-6 pt-2 snap-x scrollbar-hide px-2 md:px-0"
                 >
                     {animeList.slice(0, 10).map((anime, index) => (
-                        <Link
+                        <MotionLink
                             key={anime.id}
                             href={`/watch/${anime.id}`}
-                            className="relative flex-shrink-0 w-[140px] md:w-[170px] snap-start group outline-none flex flex-col gap-2"
+                            variants={{
+                                hidden: { opacity: 0, y: 30 },
+                                visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+                            }}
+                            whileHover={{ scale: 1.05, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                            className="relative flex-shrink-0 w-[140px] md:w-[170px] snap-start group outline-none flex flex-col gap-3"
                         >
                             {/* Standard Clean Poster */}
-                            <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#27272a] shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-white/5 group-hover:border-[#FFB000]/50 group-hover:shadow-[0_0_30px_rgba(255,176,0,0.15)] transition-all duration-500">
+                            <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#27272a] shadow-lg group-hover:shadow-[0_8px_30px_rgba(255,176,0,0.15)] transition-all duration-300">
                                 <Image
                                     src={anime.image}
                                     alt={anime.title}
                                     fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                                     unoptimized
                                 />
 
-                                {/* Electric Top-Left Rank Badge */}
-                                <div className="absolute top-0 left-0 bg-gradient-to-br from-[#FFB000] to-[#FF5E00] text-[#09090b] font-black text-sm px-3.5 py-1.5 rounded-br-xl z-30 font-outfit shadow-[0_4px_10px_rgba(255,176,0,0.3)]">
+                                {/* Pure Gold Premium Rank Badge - Clean Top Left */}
+                                <div className="absolute top-0 left-0 bg-[#FFB000] text-[#09090b] font-black text-sm px-3.5 py-1 rounded-br-xl z-30 font-outfit shadow-md">
                                     #{index + 1}
                                 </div>
 
-                                {/* Dark gradient overlay at bottom for text contrast */}
-                                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent opacity-60 z-10" />
-
-                                {/* Hover Play Button */}
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hidden md:block" />
-                                <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:flex">
-                                    <div className="w-14 h-14 bg-gradient-to-r from-[#FFB000] to-[#FF5E00] text-[#09090b] rounded-full flex items-center justify-center scale-90 group-hover:scale-100 transition-transform duration-500 shadow-xl">
-                                        <svg className="w-6 h-6 ml-1 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                                {/* Custom Play Button Overlay */}
+                                <div className="absolute inset-x-0 bottom-0 top-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 bg-black/40 backdrop-blur-[2px]">
+                                    <div className="w-12 h-12 bg-[#FFB000] text-[#09090b] rounded-full flex items-center justify-center scale-90 group-hover:scale-100 transition-transform duration-300 shadow-[0_4px_20px_rgba(255,176,0,0.4)]">
+                                        <svg className="w-5 h-5 ml-1 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Clean Text Box */}
-                            <div className="px-1">
-                                <h3 className="text-[15px] font-semibold text-[#f4f4f5] line-clamp-2 leading-snug group-hover:text-[#FFB000] transition-colors duration-300">
+                            {/* Clean Text Box - Outside image for readability */}
+                            <div className="px-1 flex flex-col gap-1">
+                                <h3 className="text-[14px] md:text-[15px] font-bold text-[#f4f4f5] line-clamp-2 leading-snug group-hover:text-[#FFB000] transition-colors duration-200">
                                     {anime.title}
                                 </h3>
-                                <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[12px] font-medium text-[#a1a1aa]">
+                                <div className="flex flex-wrap items-center gap-2 text-[12px] font-medium text-[#a1a1aa]">
                                     <span>{anime.type || 'TV'}</span>
                                     <span className="w-1 h-1 rounded-full bg-[#52525b]" />
-                                    <span>HD</span>
+                                    <span className="text-[#FFB000] font-semibold">HD</span>
                                 </div>
                             </div>
-                        </Link>
+                        </MotionLink>
                     ))}
-                </div>
+                </motion.div>
             </div>
         </div>
     );

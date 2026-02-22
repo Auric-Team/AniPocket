@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Logo from './Logo';
+import LiveSearchBar from './LiveSearchBar';
 
 export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -33,7 +34,7 @@ export default function Navbar() {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-[100] transition-colors duration-300 ${isScrolled ? 'bg-[var(--bg-secondary)] shadow-lg' : 'bg-[var(--bg-secondary)]'
+            className={`fixed top-0 left-0 right-0 z-[100] transition-colors duration-500 ${isScrolled ? 'bg-[#0b0c0f]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl' : 'bg-gradient-to-b from-[#09090b]/80 to-transparent'
                 }`}
         >
             <div className="container mx-auto px-4 max-w-[1400px]">
@@ -55,20 +56,8 @@ export default function Navbar() {
                         </Link>
 
                         {/* Desktop Search Bar */}
-                        <div className="hidden lg:flex items-center bg-[#2b2b31] rounded-full w-[400px] h-10 px-4 group focus-within:ring-1 focus-within:ring-[var(--accent)] transition-shadow">
-                            <span className="text-[#888] mr-3">
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </span>
-                            <input
-                                type="text"
-                                placeholder="Search anime..."
-                                className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-[#888]"
-                            />
-                            <button className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-[#888] hover:text-[var(--accent)] transition-colors px-2 py-1 bg-[#1e1e24] rounded-md shrink-0 border border-white/5">
-                                Filter
-                            </button>
+                        <div className="hidden lg:block w-[400px]">
+                            <LiveSearchBar />
                         </div>
                     </div>
 
