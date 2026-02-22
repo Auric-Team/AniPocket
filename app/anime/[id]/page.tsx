@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import EpisodeList from '@/components/EpisodeList';
+import SynopsisText from '@/components/SynopsisText';
 import { getAnimeDetails } from '@/lib/hianime';
 
 export const revalidate = 600;
@@ -19,27 +20,29 @@ export default async function AnimeDetailsPage({
     }
 
     return (
-        <div className="min-h-screen pb-12">
-            {/* Immersive Banner */}
-            <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
-                <Image
-                    src={anime.image || '/placeholder.jpg'}
-                    alt={anime.title}
-                    fill
-                    className="object-cover opacity-50 blur-xl scale-110"
-                    priority
-                    unoptimized
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/40 to-black/60" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-primary)]/90 via-transparent to-transparent" />
+        <div className="min-h-screen bg-[#0b0c0f] pt-[60px] pb-12">
+
+            {/* HiAnime specific Breadcrumb strip */}
+            <div className="w-full bg-[#1e1e24] py-2 border-b border-white/5 mb-6">
+                <div className="container max-w-[1400px] mx-auto px-4">
+                    <nav className="flex items-center gap-2 text-[13px] font-medium text-[#aaaaaa]">
+                        <Link href="/" className="hover:text-[var(--accent)] transition-colors">Home</Link>
+                        <span className="text-[#444] text-[10px]">●</span>
+                        <Link href="/search?type=tv" className="hover:text-[var(--accent)] transition-colors">TV</Link>
+                        <span className="text-[#444] text-[10px]">●</span>
+                        <span className="text-[#f9f9f9] line-clamp-1 max-w-[200px]">
+                            {anime.title}
+                        </span>
+                    </nav>
+                </div>
             </div>
 
-            {/* Main Content */}
-            <div className="container relative z-10 -mt-32 md:-mt-48">
-                <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+            <div className="container max-w-[1400px] mx-auto px-4">
+                <div className="flex flex-col md:flex-row gap-8 lg:gap-10 items-start">
+
                     {/* Left Column: Poster & Actions */}
-                    <div className="flex-shrink-0 flex flex-col items-center md:items-start w-full md:w-auto">
-                        <div className="relative w-[200px] md:w-[280px] aspect-[2/3] rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-[var(--bg-card)] ring-1 ring-white/10 rotate-1 hover:rotate-0 transition-transform duration-500">
+                    <div className="w-[200px] md:w-[250px] shrink-0 mx-auto md:mx-0">
+                        <div className="w-full relative aspect-[3/4] bg-[#242428] mb-4">
                             <Image
                                 src={anime.image || '/placeholder.jpg'}
                                 alt={anime.title}
@@ -50,125 +53,110 @@ export default async function AnimeDetailsPage({
                             />
                         </div>
 
-                        <div className="w-full max-w-[280px] mt-6 space-y-3">
-                            {anime.episodeList.length > 0 ? (
-                                <Link
-                                    href={`/watch/${anime.id}?ep=${anime.episodeList[0].id}&num=1`}
-                                    className="w-full btn btn-primary h-12 text-lg rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] hover:scale-105 transition-all"
-                                >
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                    Watch Now
-                                </Link>
-                            ) : (
-                                <button disabled className="w-full btn btn-secondary h-12 rounded-xl opacity-50 cursor-not-allowed">
-                                    Not Available
-                                </button>
-                            )}
-                            
-                            <button className="w-full btn bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] border border-[var(--border)] text-[var(--text-secondary)] h-11 rounded-xl transition-colors">
-                                <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        {anime.episodeList.length > 0 ? (
+                            <Link
+                                href={`/watch/${anime.id}?ep=${anime.episodeList[0].id}&num=1`}
+                                className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[#111] font-bold py-3 rounded-full flex justify-center items-center gap-2 transition-colors mb-3"
+                            >
+                                <svg className="w-5 h-5 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z" />
                                 </svg>
-                                Add to Watchlist
+                                Watch Now
+                            </Link>
+                        ) : (
+                            <button disabled className="w-full bg-[#333] text-[#888] font-bold py-3 rounded-full mb-3 cursor-not-allowed">
+                                Not Available
                             </button>
-                        </div>
+                        )}
+
+                        <button className="w-full bg-[#ffffff14] hover:bg-[#ffffff24] text-white font-semibold py-3 rounded-full transition-colors flex justify-center items-center gap-2">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+                            Add to List
+                        </button>
                     </div>
 
-                    {/* Right Column: Details */}
-                    <div className="flex-1 min-w-0 pt-4 md:pt-12">
-                        {/* Title & Stats */}
-                        <div className="mb-8">
-                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                    {/* Right Column: Details Info */}
+                    <div className="flex-1 min-w-0">
+
+                        {/* Title Row */}
+                        <div className="mb-4">
+                            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 leading-tight">
                                 {anime.title}
                             </h1>
-                            
-                            <div className="flex flex-wrap items-center gap-4 text-sm md:text-base text-gray-300">
-                                <span className="flex items-center gap-1.5 px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/5">
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                    {anime.type || 'TV'}
-                                </span>
-                                
-                                {anime.status && (
-                                    <span className={`px-3 py-1 rounded-lg border backdrop-blur-md ${
-                                        anime.status === 'Ongoing' 
-                                            ? 'bg-green-500/10 border-green-500/20 text-green-400' 
-                                            : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
-                                    }`}>
-                                        {anime.status}
-                                    </span>
-                                )}
 
-                                <div className="flex items-center gap-3 ml-2">
+                            {/* Meta Badges */}
+                            <div className="flex flex-wrap items-center gap-3 text-sm">
+                                <span className="flex items-center gap-1 bg-white text-black px-1.5 py-[2px] rounded-sm font-bold text-[11px] uppercase tracking-wider">
+                                    {anime.status && anime.status.includes('Finished') ? 'HD' : anime.status || 'HD'}
+                                </span>
+
+                                <span className="flex items-center gap-1 bg-[#242428]/90 font-bold rounded overflow-hidden">
                                     {anime.episodes?.sub && (
-                                        <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                                            <svg className="w-4 h-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                            </svg>
-                                            <span className="font-medium text-white">{anime.episodes.sub}</span> Sub
-                                        </div>
+                                        <span className="bg-[var(--badge-sub)] text-[#111] px-1.5 py-[2px] flex items-center text-[11px]">
+                                            <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z" /></svg>
+                                            {anime.episodes.sub}
+                                        </span>
                                     )}
                                     {anime.episodes?.dub && (
-                                        <div className="flex items-center gap-1 text-[var(--text-secondary)]">
-                                            <svg className="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                                            </svg>
-                                            <span className="font-medium text-white">{anime.episodes.dub}</span> Dub
-                                        </div>
+                                        <span className="bg-[var(--badge-dub)] text-[#111] px-1.5 py-[2px] flex items-center border-l border-black/10 text-[11px]">
+                                            <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /><circle cx="12" cy="12" r="3" /></svg>
+                                            {anime.episodes.dub}
+                                        </span>
                                     )}
+                                </span>
+
+                                <span className="text-[#888]">•</span>
+                                <span className="text-[#aaaaaa] font-medium">{anime.type || 'TV'}</span>
+                                <span className="text-[#888]">•</span>
+                                <span className="text-[#aaaaaa] font-medium">24m</span>
+                            </div>
+                        </div>
+
+                        {/* Synopsis */}
+                        <div className="mb-6">
+                            <SynopsisText text={anime.synopsis || "No description available for this title."} maxLength={300} />
+                        </div>
+
+                        <div className="w-full h-[1px] bg-[#ffffff14] mb-6" />
+
+                        {/* Extra Grid Metadata */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-[13px] mb-8">
+                            <div className="flex">
+                                <span className="text-[#888] w-[90px] font-medium">Type:</span>
+                                <span className="text-[#f9f9f9]">{anime.type || 'TV'}</span>
+                            </div>
+                            <div className="flex">
+                                <span className="text-[#888] w-[90px] font-medium">Status:</span>
+                                <span className="text-[#f9f9f9]">{anime.status || 'Ongoing'}</span>
+                            </div>
+                            <div className="flex">
+                                <span className="text-[#888] w-[90px] font-medium">Genres:</span>
+                                <div className="flex-1 flex flex-wrap gap-1">
+                                    {anime.genres && anime.genres.map((g, i) => (
+                                        <span key={g} className="text-[#f9f9f9] hover:text-[var(--accent)] cursor-pointer transition-colors">
+                                            {g}{i < anime.genres!.length - 1 ? ',' : ''}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Genres */}
-                        {anime.genres && anime.genres.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-8">
-                                {anime.genres.map((genre) => (
-                                    <span
-                                        key={genre}
-                                        className="px-4 py-1.5 bg-[var(--bg-card)]/50 hover:bg-[var(--accent)]/20 border border-[var(--border)] hover:border-[var(--accent)]/50 rounded-full text-sm text-[var(--text-secondary)] hover:text-white transition-all cursor-default"
-                                    >
-                                        {genre}
-                                    </span>
-                                ))}
+                        {/* Episodes Section - if they scroll down */}
+                        <div className="bg-[#1e1e24] w-full flex flex-col h-[400px] border-t border-[#ffffff14]">
+                            <div className="p-3 border-b border-[#2b2b31] flex items-center justify-between">
+                                <h3 className="font-semibold text-white">Episodes List</h3>
                             </div>
-                        )}
-
-                        {/* Synopsis */}
-                        {anime.synopsis && (
-                            <div className="mb-12 bg-[var(--bg-card)]/30 backdrop-blur-sm border border-[var(--border)] rounded-2xl p-6">
-                                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                                    <svg className="w-5 h-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Synopsis
-                                </h3>
-                                <p className="text-[var(--text-secondary)] leading-relaxed text-lg">
-                                    {anime.synopsis}
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Episodes Section */}
-                        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-6 md:p-8">
-                            {anime.episodeList.length > 0 ? (
+                            <div className="flex-1 overflow-hidden bg-[#242428]">
                                 <EpisodeList
                                     episodes={anime.episodeList}
                                     animeId={anime.id}
                                 />
-                            ) : (
-                                <div className="text-center py-12 text-[var(--text-muted)]">
-                                    <p>No episodes available yet.</p>
-                                </div>
-                            )}
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     );
 }
-

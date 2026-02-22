@@ -1,49 +1,66 @@
 @import "tailwindcss";
 
-/* ===== CSS Variables ===== */
+/* ===== CSS Variables (HiAnime Palette) ===== */
 :root {
-  --bg-primary: #050505;
-  --bg-secondary: #0a0a0b;
-  --bg-card: #121214;
-  --bg-hover: #1c1c1f;
-  
-  /* Modern Indigo-Violet Gradient Theme */
-  --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.5);
-  
+  /* True HiAnime colors */
+  --bg-primary: #0b0c0f;
+  /* Deep space black body */
+  --bg-secondary: #1e1e24;
+  /* Header/Panel background */
+  --bg-card: #242428;
+  /* Cards and dropdowns */
+  --bg-hover: #ffffff14;
+  /* Subtle hover light */
+
+  /* The iconic HiAnime Yellow/Gold */
+  --accent: #ffdd95;
+  --accent-hover: #e5c786;
+
+  /* Badges */
+  --badge-sub: #b0e3af;
+  /* Light green for Sub */
+  --badge-dub: #e3b5cd;
+  /* Light pink/purple for Dub */
+
+  /* Text */
   --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.15);
-  
-  --font-outfit: 'Outfit', sans-serif;
+  --text-secondary: #aaaaaa;
+  --text-muted: #888888;
+
+  --border: #ffffff14;
 }
 
 /* ===== Base Styles ===== */
 html {
   scroll-behavior: smooth;
-  font-family: var(--font-outfit), system-ui, sans-serif;
+  /* Use Inter or Poppins for clean streaming look */
+  font-family: var(--font-inter), system-ui, sans-serif;
+  background: var(--bg-primary);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--bg-primary);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
+  overflow-x: hidden;
+  font-size: 14px;
+  /* Standardize font size to match HiAnime density */
 }
 
 /* ===== Custom Scrollbar ===== */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #333333;
   border-radius: 10px;
 }
 
@@ -51,52 +68,41 @@ body {
   background: var(--accent);
 }
 
-/* ===== Utilities ===== */
-.gradient-text {
-  background: linear-gradient(135deg, #fff 0%, #a5a6f6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* ===== HiAnime Utilities ===== */
+.bg-secondary {
+  background-color: var(--bg-secondary);
 }
 
-.gradient-accent {
-  background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+.text-accent {
+  color: var(--accent);
 }
 
-.glass-panel {
-  background: rgba(18, 18, 20, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.bg-accent {
+  background-color: var(--accent);
+  color: #111;
 }
 
-.text-glow {
-  text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-}
-
-/* ===== Animations ===== */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 10px var(--accent-glow); }
-  50% { box-shadow: 0 0 25px var(--accent-glow); }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 3s infinite;
-}
-
-/* Hide scrollbar utility */
+/* Hide scrollbar utility for horizontal lists */
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
+
 .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Line clamping utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

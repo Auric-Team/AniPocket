@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Anime } from '@/lib/types';
 import PlaceholderImage from './PlaceholderImage';
 
@@ -12,157 +12,137 @@ interface HeroCarouselProps {
 
 export default function HeroCarousel({ animeList }: HeroCarouselProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
-    // Use top 10 anime for spotlight slider
-    const slides = animeList.slice(0, 10);
 
+    // Auto-advance
     useEffect(() => {
+        if (!animeList.length) return;
         const timer = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % slides.length);
-        }, 6000); 
+            setCurrentIndex((prev) => (prev + 1) % animeList.length);
+        }, 6000);
         return () => clearInterval(timer);
-    }, [slides.length]);
+    }, [animeList.length]);
 
-    if (slides.length === 0) return null;
+    if (!animeList || animeList.length === 0) return null;
+
+    const currentAnime = animeList[currentIndex];
 
     return (
-        <div className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden bg-[var(--bg-primary)] z-0 group">
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentIndex}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute inset-0"
+        <div className="relative w-full h-[50vh] md:h-[70vh] min-h-[400px] max-h-[700px] bg-[#0b0c0f] overflow-hidden">
+
+            {/* The Background Image Array - Crossfading */}
+            {animeList.map((anime, idx) => (
+                <div
+                    key={anime.id}
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${idx === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                        }`}
                 >
-                    {/* Original Banner Image (Clear, No Blur) */}
-                    <div className="absolute inset-0">
+                    {/* HiAnime uses posters pinned to the right, bleeding into dark on the left */}
+                    <div className="absolute top-0 right-0 w-full md:w-3/4 h-full">
                         <PlaceholderImage
-                            src={slides[currentIndex].image}
-                            alt={slides[currentIndex].title}
+                            src={anime.image}
+                            alt={anime.title}
                             fill
-                            className="object-cover opacity-100"
-                            priority
+                            className="object-cover object-top opacity-80"
+                            priority={idx === 0}
                         />
-                        {/* Gradient Overlays for Text Readability */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-black/30" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-primary)]/90 via-[var(--bg-primary)]/40 to-transparent" />
+                        {/* Gradient Mask to blend image into background */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#0b0c0f] via-[#0b0c0f]/80 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c0f] via-transparent to-transparent" />
+                    </div>
+                </div>
+            ))}
+
+            {/* Content Overlay */}
+            <div className="absolute inset-0 z-20 container mx-auto px-4 max-w-[1400px] flex flex-col justify-center">
+                <div className="w-full md:w-[60%] lg:w-[50%] flex flex-col items-start gap-4">
+
+                    {/* Spotlight Badge */}
+                    <div className="text-[var(--accent)] text-sm font-bold tracking-widest uppercase">
+                        #{currentIndex + 1} Spotlight
                     </div>
 
-                    {/* Content Container */}
-                    <div className="container relative h-full flex items-center pt-16 md:pt-20">
-                        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 w-full">
-                            {/* Text Content */}
-                            <div className="flex-1 max-w-2xl z-10 space-y-6">
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.2, duration: 0.5 }}
-                                >
-                                    <span className="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-wider uppercase text-[var(--accent)] bg-[var(--accent)]/10 border border-[var(--accent)]/20 rounded-full">
-                                        #{currentIndex + 1} Spotlight
-                                    </span>
-                                    <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold leading-tight text-white line-clamp-2 drop-shadow-xl">
-                                        {slides[currentIndex].title}
-                                    </h1>
-                                </motion.div>
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] line-clamp-2 md:line-clamp-3 
+                        drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                        {currentAnime.title}
+                    </h1>
 
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.3, duration: 0.5 }}
-                                    className="line-clamp-3 text-gray-300 text-sm md:text-base leading-relaxed max-w-xl drop-shadow-md"
-                                >
-                                    {slides[currentIndex].synopsis}
-                                </motion.div>
+                    {/* HiAnime Meta Bar */}
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 text-sm font-medium text-white mb-2">
+                        <span className="flex items-center gap-1.5 font-bold">
+                            <svg className="w-4 h-4 text-[#3db4f2]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
+                            {currentAnime.type || 'TV'}
+                        </span>
 
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.4, duration: 0.5 }}
-                                    className="flex flex-wrap items-center gap-4 text-sm md:text-base text-white font-medium"
-                                >
-                                    {slides[currentIndex].type && (
-                                        <span className="flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M4 6h16v12H4z" />
-                                            </svg>
-                                            {slides[currentIndex].type}
-                                        </span>
-                                    )}
-                                    {slides[currentIndex].episodes?.sub && (
-                                        <span className="flex items-center gap-1 px-2 py-0.5 bg-white/20 backdrop-blur-md rounded">
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                            </svg>
-                                            {slides[currentIndex].episodes.sub}
-                                        </span>
-                                    )}
-                                    <span className="px-2 py-0.5 bg-[var(--accent)] rounded text-xs font-bold">HD</span>
-                                </motion.div>
-
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.5, duration: 0.5 }}
-                                    className="flex items-center gap-4 pt-4"
-                                >
-                                    <Link
-                                        href={`/anime/${slides[currentIndex].id}`}
-                                        className="btn btn-primary h-12 px-8 text-lg rounded-full hover:scale-105 transition-transform shadow-[0_0_20px_rgba(99,102,241,0.4)] flex items-center"
-                                    >
-                                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z" />
-                                        </svg>
-                                        Watch Now
-                                    </Link>
-                                    <Link
-                                        href={`/anime/${slides[currentIndex].id}`}
-                                        className="btn bg-white/10 border border-white/20 hover:bg-white/20 h-12 px-8 text-lg rounded-full backdrop-blur-md transition-colors"
-                                    >
-                                        Details
-                                    </Link>
-                                </motion.div>
-                            </div>
-                            
-                            {/* Poster Image Removed to prevent overlap and show full banner */}
+                        <div className="flex bg-[#242428]/90 text-[11px] font-bold rounded overflow-hidden">
+                            {currentAnime.episodes?.sub && (
+                                <span className="bg-[var(--badge-sub)] text-[#111] px-1.5 py-0.5 flex items-center">
+                                    <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z" /></svg>
+                                    {currentAnime.episodes.sub}
+                                </span>
+                            )}
+                            {currentAnime.episodes?.dub && (
+                                <span className="bg-[var(--badge-dub)] text-[#111] px-1.5 py-0.5 flex items-center border-l border-black/10">
+                                    <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /><circle cx="12" cy="12" r="3" /></svg>
+                                    {currentAnime.episodes.dub}
+                                </span>
+                            )}
                         </div>
+
+                        <span className="text-[#888] hidden sm:inline">•</span>
+                        <span className="text-[#aaaaaa] font-medium hidden sm:inline">HD</span>
                     </div>
-                </motion.div>
-            </AnimatePresence>
 
-            {/* Navigation Arrows */}
-            <button 
-                onClick={() => setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length)}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/20 hover:bg-[var(--accent)] text-white rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 z-20"
-            >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
-            <button 
-                onClick={() => setCurrentIndex((prev) => (prev + 1) % slides.length)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/20 hover:bg-[var(--accent)] text-white rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 z-20"
-            >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-            </button>
+                    <p className="text-[#aaaaaa] text-sm leading-relaxed line-clamp-3 md:line-clamp-4 max-w-xl mb-4 font-medium">
+                        {currentAnime.synopsis || "No description available for this title."}
+                    </p>
 
-            {/* Indicators */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                {slides.map((_, idx) => (
+                    <div className="flex flex-wrap items-center gap-4">
+                        <Link
+                            href={`/watch/${currentAnime.id}`}
+                            className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[#111] font-bold py-3 px-6 md:px-8 rounded-full flex items-center gap-2 transition-transform hover:scale-105"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                            WATCH NOW
+                        </Link>
+                        <Link
+                            href={`/anime/${currentAnime.id}`}
+                            className="bg-[#242428] hover:bg-[#3b3b42] text-white font-semibold py-3 px-6 rounded-full flex items-center gap-2 transition-colors border border-white/5"
+                        >
+                            Detail
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Pagination Nav - Exact HiAnime Style */}
+            <div className="hidden lg:flex absolute right-4 bottom-1/2 translate-y-1/2 z-30 flex-col gap-3">
+                {animeList.slice(0, 5).map((anime, idx) => (
                     <button
                         key={idx}
                         onClick={() => setCurrentIndex(idx)}
-                        className={`h-1 rounded-full transition-all duration-300 ${idx === currentIndex
-                                ? 'bg-[var(--accent)] w-8 shadow-[0_0_10px_var(--accent)]'
-                                : 'bg-white/30 hover:bg-white/60 w-2'
+                        className={`group relative h-12 w-12 rounded bg-black/60 overflow-hidden border-2 transition-all ${idx === currentIndex ? 'border-[var(--accent)] scale-110' : 'border-transparent hover:border-white/40'
                             }`}
-                        aria-label={`Go to slide ${idx + 1}`}
+                    >
+                        <Image src={anime.image} alt="nav" fill className="object-cover opacity-60 group-hover:opacity-100" />
+                    </button>
+                ))}
+            </div>
+
+            {/* Mobile Dots */}
+            <div className="absolute bottom-4 left-0 right-0 z-30 flex justify-center gap-2 lg:hidden">
+                {animeList.map((_, idx) => (
+                    <button
+                        key={idx}
+                        onClick={() => setCurrentIndex(idx)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-6 bg-[var(--accent)]' : 'bg-white/30'
+                            }`}
                     />
                 ))}
             </div>
+
+            {/* Gradient bottom fade to mix into next section */}
+            <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-[var(--bg-primary)] to-transparent z-20" />
         </div>
     );
 }
