@@ -10,6 +10,7 @@ export interface Anime {
     episodes?: {
         sub?: number;
         dub?: number;
+        hindi?: number;
     };
     duration?: string;
     rating?: string;

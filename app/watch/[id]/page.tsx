@@ -44,6 +44,7 @@ export default async function WatchPage({
 
     const servers = await getEpisodeServers(currentEpId);
     const hasDub = servers.dub;
+    const hasHindi = servers.hindi;
 
     return (
         <div className="min-h-screen bg-[var(--bg-primary)] relative">
@@ -99,6 +100,7 @@ export default async function WatchPage({
                                     animeTitle={anime.title}
                                     episodeNumber={episodeNumber}
                                     hasDub={hasDub}
+                                    hasHindi={hasHindi}
                                     nextEpisodeUrl={nextEpisodeUrl}
                                 />
                             </div>
@@ -165,6 +167,12 @@ export default async function WatchPage({
                                                 <span className="bg-[var(--badge-dub)] text-[#111] px-1.5 py-[2px] flex items-center border-l border-black/10">
                                                     <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /><circle cx="12" cy="12" r="3" /></svg>
                                                     {anime.episodes.dub}
+                                                </span>
+                                            )}
+                                            {anime.episodes?.hindi && (
+                                                <span className="bg-[#FFB000] text-[#111] px-1.5 py-[2px] flex items-center border-l border-black/10">
+                                                    <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /><circle cx="12" cy="12" r="3" /></svg>
+                                                    {anime.episodes.hindi}
                                                 </span>
                                             )}
                                         </div>

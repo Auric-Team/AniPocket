@@ -10,24 +10,23 @@ interface VideoPlayerProps {
     animeTitle: string;
     episodeNumber?: number;
     hasDub?: boolean;
+    hasHindi?: boolean;
     nextEpisodeUrl?: string;
 }
 
-export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasDub = false, nextEpisodeUrl }: VideoPlayerProps) {
+export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasDub = false, hasHindi = false, nextEpisodeUrl }: VideoPlayerProps) {
     const router = useRouter();
-    const [language, setLanguage] = useState<'sub' | 'dub'>('sub');
+    const [language, setLanguage] = useState<'sub' | 'dub' | 'hindi'>('sub');
     const [isLoading, setIsLoading] = useState(true);
 
-    // Simulation States for Tier-1 features
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [showNextOverlay, setShowNextOverlay] = useState(false);
     const [countdown, setCountdown] = useState(10);
     const [isHovered, setIsHovered] = useState(false);
 
-    // 22.5 minutes (1350 seconds) is the average point an anime episode finishes and the ED starts.
     const AUTO_NEXT_TRIGGER_SECONDS = 1350;
 
-    const embedUrl = getEmbedUrl(episodeId, language);
+    const embedUrl = getEmbedUrl(episodeId, language, animeTitle, episodeNumber);
 
     // Master Timer: Start counting seconds once the iframe loads
     useEffect(() => {
@@ -58,6 +57,14 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
             router.push(nextEpisodeUrl);
         }
     }, [timeElapsed, showNextOverlay, countdown, nextEpisodeUrl, isLoading, router]);
+
+    // Reset loading state when episode changes
+    useEffect(() => {
+        setIsLoading(true);
+        setTimeElapsed(0);
+        setShowNextOverlay(false);
+        setCountdown(10);
+    }, [episodeId]);
 
     return (
         <div
@@ -151,9 +158,19 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
                                     ? 'text-[#a1a1aa] hover:text-white hover:bg-white/5'
                                     : 'text-white/20 cursor-not-allowed hidden'
                                 }`}
-                            title={hasDub ? "Switch to Dub" : "Dub not available"}
+                            title={hasDub ? "Switch to English Dub" : "Dub not available"}
                         >
                             DUB
+                        </button>
+                        <button
+                            onClick={() => { setLanguage('hindi'); setIsLoading(true); }}
+                            className={`px-4 py-1.5 rounded-full transition-all ${language === 'hindi'
+                                ? 'bg-[#FFB000] text-[#09090b] shadow-[0_2px_10px_rgba(255,176,0,0.3)] font-bold'
+                                : 'text-[#a1a1aa] hover:text-white hover:bg-white/5'
+                                }`}
+                            title="Switch to Hindi Dub"
+                        >
+                            HINDI
                         </button>
                     </div>
                 </div>

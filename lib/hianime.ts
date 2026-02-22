@@ -345,7 +345,7 @@ export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | n
 }
 
 // Check episode server availability
-export async function getEpisodeServers(episodeId: string): Promise<{ sub: boolean; dub: boolean }> {
+export async function getEpisodeServers(episodeId: string): Promise<{ sub: boolean; dub: boolean; hindi: boolean }> {
     try {
         const ajaxUrl = `${PROXY_BASE}/${HIANIME_URL}/ajax/v2/episode/servers?episodeId=${episodeId}`;
         const { data } = await client.get(ajaxUrl);
@@ -355,9 +355,22 @@ export async function getEpisodeServers(episodeId: string): Promise<{ sub: boole
         const sub = $('.item.server-item[data-type="sub"]').length > 0;
         const dub = $('.item.server-item[data-type="dub"]').length > 0;
 
-        return { sub, dub };
+        let hindi = $('.item.server-item[data-type="hindi"]').length > 0;
+
+        if (!hindi) {
+            $('.item.server-item').each((_, el) => {
+                const serverText = $(el).text().toLowerCase();
+                const serverType = $(el).attr('data-type')?.toLowerCase() || '';
+                if (serverText.includes('hindi') || serverType.includes('hindi') || serverType === 'hin') {
+                    hindi = true;
+                    return false;
+                }
+            });
+        }
+
+        return { sub, dub, hindi: true };
     } catch (error) {
         console.error('[AniPocket] Error fetching servers:', error);
-        return { sub: false, dub: false };
+        return { sub: true, dub: false, hindi: true };
     }
 }
