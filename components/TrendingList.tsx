@@ -24,7 +24,7 @@ export default function TrendingList({ animeList }: TrendingListProps) {
 
     return (
         <div className="w-full relative">
-            <div className="flex items-center justify-between mb-4 px-2">
+            <div className="flex items-center justify-between mb-4 px-4 md:px-2">
                 <h2 className="text-xl font-bold text-white tracking-wide">
                     Trending
                 </h2>
@@ -48,7 +48,7 @@ export default function TrendingList({ animeList }: TrendingListProps) {
                 {/* Horizontal Scroll Container */}
                 <div
                     ref={listRef}
-                    className="flex overflow-x-auto gap-4 pb-4 pt-2 scrollbar-hide snap-x"
+                    className="flex overflow-x-auto gap-4 pb-6 pt-2 px-4 md:px-0 scrollbar-hide snap-x"
                 >
                     {animeList.map((anime, index) => (
                         <Link
@@ -58,8 +58,7 @@ export default function TrendingList({ animeList }: TrendingListProps) {
                         >
                             {/* HiAnime specific Trending Layout: Large number overlapping a landscape poster */}
                             <div className="flex items-end">
-                                {/* Large Rank Number Text */}
-                                <div className="text-5xl lg:text-7xl font-bold text-transparent mr-2 transform translate-y-2 opacity-50"
+                                <div className="text-4xl md:text-5xl lg:text-7xl font-bold text-transparent mr-2 md:mr-3 transform translate-y-1 lg:translate-y-2 opacity-50 transition-all font-mono"
                                     style={{ WebkitTextStroke: '2px var(--accent)' }}>
                                     {(index + 1).toString().padStart(2, '0')}
                                 </div>

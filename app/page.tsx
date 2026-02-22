@@ -40,7 +40,23 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen pb-16 bg-[var(--bg-primary)]">
       {/* Spotlight Slider */}
-      <Suspense fallback={<div className="h-[60vh] md:h-[70vh] w-full bg-black/50 animate-pulse" />}>
+      <Suspense fallback={
+        <div className="w-full h-[50vh] md:h-[70vh] min-h-[400px] max-h-[700px] bg-[#0b0c0f] relative overflow-hidden flex items-center">
+          <div className="absolute inset-0 bg-[#1e1e24] animate-pulse" />
+          <div className="container relative z-10 px-4">
+            <div className="w-3/4 md:w-1/2 space-y-4">
+              <div className="h-4 w-24 bg-[#333] rounded animate-pulse" />
+              <div className="h-12 md:h-20 w-full bg-[#333] rounded animate-pulse" />
+              <div className="h-4 w-48 bg-[#333] rounded animate-pulse" />
+              <div className="h-24 w-full bg-[#333] rounded animate-pulse" />
+              <div className="flex gap-4 pt-4">
+                <div className="h-12 w-32 bg-[#333] rounded-full animate-pulse" />
+                <div className="h-12 w-32 bg-[#333] rounded-full animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+      }>
         <HeroCarousel animeList={spotlightList} />
       </Suspense>
 

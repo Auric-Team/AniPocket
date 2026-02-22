@@ -2,11 +2,12 @@ import type { Metadata, Viewport } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import Logo from '@/components/Logo';
 import BackgroundEffects from '@/components/BackgroundEffects';
 import ProgressBar from '@/components/ProgressBar';
 import { Suspense } from 'react';
 
-const outfit = Outfit({ 
+const outfit = Outfit({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-outfit',
@@ -22,7 +23,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#0a0a0b',
+  themeColor: '#0b0c0f',
 };
 
 export default function RootLayout({
@@ -40,7 +41,7 @@ export default function RootLayout({
       <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
         {/* Cinematic Background */}
         <BackgroundEffects />
-        
+
         {/* Navigation Progress Bar */}
         <Suspense fallback={null}>
           <ProgressBar />
@@ -58,19 +59,14 @@ export default function RootLayout({
             <div className="container">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div className="col-span-1 md:col-span-2">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-10 h-10 bg-gradient-to-tr from-[var(--accent)] to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-[var(--accent)]/20">
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                    <span className="text-2xl font-bold tracking-tight">AniPocket</span>
+                  <div className="flex items-center gap-2 mb-6">
+                    <Logo />
                   </div>
                   <p className="text-[var(--text-muted)] text-sm max-w-sm leading-relaxed">
                     The next generation of anime streaming. Built for fans who appreciate quality, speed, and aesthetics.
                   </p>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold mb-4 text-white">Explore</h4>
                   <ul className="space-y-2 text-sm text-[var(--text-muted)]">
@@ -89,7 +85,7 @@ export default function RootLayout({
                   </ul>
                 </div>
               </div>
-              
+
               <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p className="text-[var(--text-muted)] text-xs">
                   © {new Date().getFullYear()} AniPocket. Non-commercial project.

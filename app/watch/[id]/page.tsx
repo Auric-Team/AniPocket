@@ -64,8 +64,8 @@ export default async function WatchPage({
 
                     {/* Video Column */}
                     <div className="lg:col-span-3">
-                        {/* Video Player Box */}
-                        <div className="bg-[#111] overflow-hidden">
+                        {/* Video Player Box with Cinematic Glow */}
+                        <div className="bg-[#111] overflow-hidden rounded-t-lg shadow-[0_0_50px_rgba(255,221,149,0.05)] border border-white/5 relative z-10">
                             <VideoPlayer
                                 episodeId={currentEpId}
                                 animeTitle={anime.title}
