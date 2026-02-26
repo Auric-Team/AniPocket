@@ -309,14 +309,15 @@ async function extractMegaCloudSource(embedUrl: string): Promise<VideoSource | n
 async function extractMegaCloudSourceById(videoId: string): Promise<VideoSource | null> {
     try {
         const clientKey = await getMegaCloudClientKey(videoId);
+        console.log('[MegaCloud] Client key:', clientKey);
         
         const sourcesUrls = [
-            `${PROXY_BASE}/https://megacloud.tv/embed-2/ajax/e-1/getSources?id=${videoId}`,
-            `${PROXY_BASE}/https://megacloud.blog/embed-2/ajax/e-1/getSources?id=${videoId}`,
             `${PROXY_BASE}/https://megacloud.tv/embed-2/v2/e-1/getSources?id=${videoId}`,
             `${PROXY_BASE}/https://megacloud.blog/embed-2/v2/e-1/getSources?id=${videoId}`,
             `${PROXY_BASE}/https://megacloud.tv/embed-2/v3/e-1/getSources?id=${videoId}`,
             `${PROXY_BASE}/https://megacloud.blog/embed-2/v3/e-1/getSources?id=${videoId}`,
+            `${PROXY_BASE}/https://megacloud.tv/embed-2/ajax/e-1/getSources?id=${videoId}`,
+            `${PROXY_BASE}/https://megacloud.blog/embed-2/ajax/e-1/getSources?id=${videoId}`,
         ];
         
         if (clientKey) {
@@ -333,6 +334,7 @@ async function extractMegaCloudSourceById(videoId: string): Promise<VideoSource 
         
         for (const sourcesUrl of sourcesUrls) {
             try {
+                console.log('[MegaCloud] Trying URL:', sourcesUrl);
                 const { data: resData } = await axios.get(sourcesUrl, {
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -343,6 +345,7 @@ async function extractMegaCloudSourceById(videoId: string): Promise<VideoSource 
                 });
                 data = resData;
                 usedUrl = sourcesUrl;
+                console.log('[MegaCloud] Success with URL:', sourcesUrl);
                 break;
             } catch (e) {
                 continue;
