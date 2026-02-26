@@ -36,6 +36,18 @@ async function fetchWithProxy(url: string, referer: string = 'https://hianime.to
     }
 }
 
+function simpleDecrypt(encrypted: string, key: string): string {
+    try {
+        const result: string[] = [];
+        for (let i = 0; i < encrypted.length; i++) {
+            result.push(String.fromCharCode(encrypted.charCodeAt(i) ^ key.charCodeAt(i % key.length)));
+        }
+        return atob(result.join(''));
+    } catch (e) {
+        return '';
+    }
+}
+
 export async function getVideoSource(embedUrl: string): Promise<VideoSource | null> {
     try {
         console.log('[VideoSource] Fetching embed URL:', embedUrl);
@@ -46,8 +58,19 @@ export async function getVideoSource(embedUrl: string): Promise<VideoSource | nu
         }
 
         let referer = 'https://hianime.to/';
+        
         if (fetchUrl.includes('megacloud')) {
             referer = 'https://megacloud.tv';
+            
+            const kMatch = fetchUrl.match(/[?&]k=([^&]+)/);
+            if (kMatch && kMatch[1]) {
+                console.log('[VideoSource] Found megacloud k param:', kMatch[1]);
+                const megaSource = await extractMegaCloudFromEmbed(fetchUrl, kMatch[1]);
+                if (megaSource) {
+                    return megaSource;
+                }
+            }
+            
             const megaSource = await extractMegaCloudSource(fetchUrl);
             if (megaSource) {
                 return megaSource;
@@ -302,6 +325,89 @@ async function extractMegaCloudSource(embedUrl: string): Promise<VideoSource | n
         return extractMegaCloudSourceById(videoId);
     } catch (error) {
         console.error('[MegaCloud] Extract error:', error);
+        return null;
+    }
+}
+
+async function extractMegaCloudFromEmbed(embedUrl: string, key: string): Promise<VideoSource | null> {
+    try {
+        console.log('[MegaCloud] Extracting from embed with key:', key);
+        
+        const videoIdMatch = embedUrl.match(/\/embed[/-]?\d*\/[e-]?\d*\/([^?\/]+)/);
+        if (!videoIdMatch) return null;
+        
+        const videoId = videoIdMatch[1];
+        const embedBase = embedUrl.split('/embed-')[0];
+        
+        const sourcesUrls = [
+            `${embedBase}/embed-2/v3/e-1/getSources?id=${videoId}`,
+            `${embedBase}/embed-2/v2/e-1/getSources?id=${videoId}`,
+            `${embedBase}/embed-1/v2/e-1/getSources?id=${videoId}`,
+        ];
+        
+        for (const sourcesUrl of sourcesUrls) {
+            try {
+                console.log('[MegaCloud] Trying:', sourcesUrl);
+                const { data } = await axios.get(sourcesUrl, {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                        'Referer': 'https://megacloud.tv',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    timeout: 10000,
+                });
+                
+                console.log('[MegaCloud] Got response:', JSON.stringify(data).slice(0, 300));
+                
+                if (data.sources) {
+                    let sourceUrl = data.sources;
+                    
+                    if (data.encrypted) {
+                        const decrypted = simpleDecrypt(sourceUrl, key);
+                        console.log('[MegaCloud] Decrypted:', decrypted.slice(0, 200));
+                        try {
+                            const parsed = JSON.parse(decrypted);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                return {
+                                    url: parsed[0].file || parsed[0].url,
+                                    type: 'm3u8',
+                                    encrypted: false,
+                                    embedUrl,
+                                    referer: 'https://megacloud.tv',
+                                };
+                            }
+                        } catch (e) {
+                            if (decrypted.includes('.m3u8')) {
+                                return {
+                                    url: decrypted,
+                                    type: 'm3u8',
+                                    encrypted: false,
+                                    embedUrl,
+                                    referer: 'https://megacloud.tv',
+                                };
+                            }
+                        }
+                    }
+                    
+                    if (Array.isArray(sourceUrl) && sourceUrl.length > 0) {
+                        return {
+                            url: sourceUrl[0].file || sourceUrl[0].url,
+                            type: 'm3u8',
+                            encrypted: false,
+                            embedUrl,
+                            referer: 'https://megacloud.tv',
+                        };
+                    }
+                }
+            } catch (e) {
+                console.log('[MegaCloud] Failed URL:', sourcesUrl);
+                continue;
+            }
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('[MegaCloud] Extract from embed error:', error);
         return null;
     }
 }
