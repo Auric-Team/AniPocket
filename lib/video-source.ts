@@ -3,7 +3,29 @@ import * as cheerio from 'cheerio';
 import CryptoJS from 'crypto-js';
 import crypto from 'crypto';
 
-const PROXY_BASE = 'https://cors.eu.org';
+const VERCEL_PROXY = 'https://vercel-proxy-kappa-nine.vercel.app/';
+
+const STREAM_PROXIES = [
+    'https://cdn.4animo.xyz/proxy',
+    'https://proxy.useless.nl',
+    'https://api.pike.tech/proxy',
+];
+
+const CORS_PROXIES = [
+    (url: string) => `https://vercel-proxy-kappa-nine.vercel.app/api/proxy?url=${encodeURIComponent(url)}`,
+    (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+];
+
+let currentProxyIndex = 0;
+
+function getProxyUrl(url: string): string {
+    return CORS_PROXIES[currentProxyIndex](url);
+}
+
+function rotateProxy(): void {
+    currentProxyIndex = (currentProxyIndex + 1) % CORS_PROXIES.length;
+}
 
 const MEGA_KEYS = {
     mega: 'nTAygRRNLS3wo82OtMyfPrWgD9K2UIvcwlj',
@@ -21,19 +43,28 @@ interface VideoSource {
 }
 
 async function fetchWithProxy(url: string, referer: string = 'https://hianime.to/', timeout: number = 8000) {
-    try {
-        const response = await axios.get(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Referer': referer,
-            },
-            timeout,
-        });
-        return response.data;
-    } catch (error) {
-        console.error('[VideoSource] Fetch error:', error);
-        return null;
+    let lastError = null;
+    
+    for (let attempt = 0; attempt < CORS_PROXIES.length; attempt++) {
+        try {
+            const proxyUrl = getProxyUrl(url);
+            const response = await axios.get(proxyUrl, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Referer': referer,
+                },
+                timeout,
+            });
+            return response.data;
+        } catch (error: any) {
+            console.log('[FetchWithProxy] Failed attempt', attempt + 1, error.message);
+            lastError = error;
+            rotateProxy();
+        }
     }
+    
+    console.error('[VideoSource] All proxies failed:', lastError);
+    return null;
 }
 
 function simpleDecrypt(encrypted: string, key: string): string {
@@ -45,6 +76,38 @@ function simpleDecrypt(encrypted: string, key: string): string {
         return atob(result.join(''));
     } catch (e) {
         return '';
+    }
+}
+
+async function fetchMegaCloudKey(videoId: string): Promise<string | null> {
+    try {
+        const urls = [
+            `https://megacloud.tv/embed-2/v3/e-1/${videoId}`,
+            `https://megacloud.blog/embed-2/v3/e-1/${videoId}`,
+            `https://megacloud.tv/embed-2/e-1/${videoId}`,
+        ];
+        
+        for (const url of urls) {
+            try {
+                const html = await fetchWithProxy(url, 'https://megacloud.tv', 8000);
+                if (!html) continue;
+                
+                const dpiMatch = html.match(/data-dpi="([^"]+)"/);
+                if (dpiMatch && dpiMatch[1]) {
+                    return dpiMatch[1];
+                }
+                
+                const keyMatch = html.match(/"key"\s*:\s*"([^"]+)"/);
+                if (keyMatch && keyMatch[1]) {
+                    return keyMatch[1];
+                }
+            } catch (e) {
+                continue;
+            }
+        }
+        return null;
+    } catch (e) {
+        return null;
     }
 }
 
@@ -61,20 +124,25 @@ export async function getVideoSource(embedUrl: string): Promise<VideoSource | nu
         
         if (fetchUrl.includes('megacloud')) {
             referer = 'https://megacloud.tv';
-            
             const kMatch = fetchUrl.match(/[?&]k=([^&]+)/);
             if (kMatch && kMatch[1]) {
-                console.log('[VideoSource] Found megacloud k param:', kMatch[1]);
                 const megaSource = await extractMegaCloudFromEmbed(fetchUrl, kMatch[1]);
-                if (megaSource) {
-                    return megaSource;
-                }
+                if (megaSource) return megaSource;
             }
-            
             const megaSource = await extractMegaCloudSource(fetchUrl);
-            if (megaSource) {
-                return megaSource;
-            }
+            if (megaSource) return megaSource;
+        } else if (fetchUrl.includes('t-cloud')) {
+            referer = 'https://t-cloud.live';
+            const tCloudSource = await extractTCloudSource(fetchUrl);
+            if (tCloudSource) return tCloudSource;
+        } else if (fetchUrl.includes('vidsrc')) {
+            referer = 'https://vidsrc.nl';
+            const vidSrcSource = await extractVidSrcSource(fetchUrl);
+            if (vidSrcSource) return vidSrcSource;
+        } else if (fetchUrl.includes('decoder')) {
+            referer = 'https://decoder.to';
+            const decoderSource = await extractDecoderSource(fetchUrl);
+            if (decoderSource) return decoderSource;
         } else if (fetchUrl.includes('streamtape')) {
             referer = 'https://streamtape.com';
         } else if (fetchUrl.includes('doodstream')) {
@@ -129,7 +197,7 @@ export async function getVideoSource(embedUrl: string): Promise<VideoSource | nu
 
 export async function getHianimeSource(episodeId: string, serverType: 'sub' | 'dub' = 'sub'): Promise<VideoSource | null> {
     try {
-        const serversUrl = `${PROXY_BASE}/https://hianime.to/ajax/v2/episode/servers?episodeId=${episodeId}`;
+        const serversUrl = getProxyUrl(`https://hianime.to/ajax/v2/episode/servers?episodeId=${episodeId}`);
         const { data } = await axios.get(serversUrl, { timeout: 10000 });
         
         const html = typeof data === 'string' ? data : data.html || '';
@@ -149,25 +217,31 @@ export async function getHianimeSource(episodeId: string, serverType: 'sub' | 'd
 
         console.log('[VideoSource] Available servers:', servers);
 
-        for (const server of servers.slice(0, 2)) {
+        for (const server of servers) {
             if (server.type !== serverType && serverType !== 'sub') continue;
             
-            const sourceUrl = `${PROXY_BASE}/https://hianime.to/ajax/v2/episode/sources?id=${server.id}`;
-            const sourceData = await axios.get(sourceUrl, { timeout: 10000 });
-            
-            if (sourceData.data && sourceData.data.link) {
-                const embedUrl = sourceData.data.link;
-                console.log('[VideoSource] Trying server:', server.name, embedUrl);
+            try {
+                const sourceUrl = getProxyUrl(`https://hianime.to/ajax/v2/episode/sources?id=${server.id}`);
+                const sourceData = await axios.get(sourceUrl, { timeout: 10000 });
                 
-                if (embedUrl.includes('megacloud') && (embedUrl.includes('404') || embedUrl.includes('deleted') || embedUrl.includes('not-found'))) {
-                    console.log('[VideoSource] MegaCloud dead, trying next server');
-                    continue;
+                if (sourceData.data && sourceData.data.link) {
+                    const embedUrl = sourceData.data.link;
+                    console.log('[VideoSource] Trying server:', server.name, embedUrl);
+                    
+                    if (embedUrl.includes('megacloud') && (embedUrl.includes('404') || embedUrl.includes('deleted') || embedUrl.includes('not-found'))) {
+                        console.log('[VideoSource] MegaCloud dead, trying next server');
+                        continue;
+                    }
+                    
+                    const source = await getVideoSource(embedUrl);
+                    if (source && source.url) {
+                        console.log('[VideoSource] Got source:', source.url);
+                        return source;
+                    }
                 }
-                
-                const source = await getVideoSource(embedUrl);
-                if (source) {
-                    return source;
-                }
+            } catch (e) {
+                console.log('[VideoSource] Server failed:', server.name, e);
+                continue;
             }
         }
 
@@ -218,40 +292,42 @@ function decryptSrc2(encrypted: string, clientKey: string, serverKey: string): s
 async function getMegaCloudClientKey(sourceId: string): Promise<string | null> {
     try {
         const urls = [
-            `${PROXY_BASE}/https://megacloud.tv/embed-2/e-1/${sourceId}`,
-            `${PROXY_BASE}/https://megacloud.tv/embed-1/e-1/${sourceId}`,
-            `${PROXY_BASE}/https://megacloud.blog/embed-2/e-1/${sourceId}`,
+            `https://megacloud.tv/embed-2/e-1/${sourceId}`,
+            `https://megacloud.tv/embed-2/v3/e-1/${sourceId}`,
+            `https://megacloud.blog/embed-2/e-1/${sourceId}`,
+            `https://megacloud.blog/embed-2/v3/e-1/${sourceId}`,
         ];
         
         for (const iframeUrl of urls) {
             try {
-                const { data } = await axios.get(iframeUrl, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                        'Referer': 'https://hianime.to/',
-                    },
-                    timeout: 5000,
-                });
+                const html = await fetchWithProxy(iframeUrl, 'https://megacloud.tv', 8000);
+                if (!html) continue;
+                
+                const dpiMatch = html.match(/data-dpi="([^"]+)"/);
+                if (dpiMatch && dpiMatch[1]) {
+                    console.log('[ClientKey] Found data-dpi key:', dpiMatch[1]);
+                    return dpiMatch[1];
+                }
 
-                const clientKeyMatch = data.match(/clientKey\s*[:=]\s*["']([^"']+)["']/);
+                const clientKeyMatch = html.match(/clientKey\s*[:=]\s*["']([^"']+)["']/);
                 if (clientKeyMatch && clientKeyMatch[1]) {
                     console.log('[ClientKey] Found key:', clientKeyMatch[1]);
                     return clientKeyMatch[1];
                 }
 
-                const dataKeyMatch = data.match(/data-key\s*=\s*["']([^"']+)["']/);
+                const dataKeyMatch = html.match(/data-key\s*=\s*["']([^"']+)["']/);
                 if (dataKeyMatch && dataKeyMatch[1]) {
                     console.log('[ClientKey] Found data-key:', dataKeyMatch[1]);
                     return dataKeyMatch[1];
                 }
                 
-                const v3KeyMatch = data.match(/"key"\s*:\s*"([^"]+)"/);
+                const v3KeyMatch = html.match(/"key"\s*:\s*"([^"]+)"/);
                 if (v3KeyMatch && v3KeyMatch[1]) {
                     console.log('[ClientKey] Found v3 key:', v3KeyMatch[1]);
                     return v3KeyMatch[1];
                 }
             } catch (e) {
-                console.log('[ClientKey] Failed URL:', iframeUrl);
+                rotateProxy();
                 continue;
             }
         }
@@ -339,6 +415,14 @@ async function extractMegaCloudFromEmbed(embedUrl: string, key: string): Promise
         const videoId = videoIdMatch[1];
         const embedBase = embedUrl.split('/embed-')[0];
         
+        let decryptionKey = key;
+        
+        const fetchedKey = await fetchMegaCloudKey(videoId);
+        if (fetchedKey) {
+            decryptionKey = fetchedKey;
+            console.log('[MegaCloud] Fetched key from page:', decryptionKey);
+        }
+        
         const sourcesUrls = [
             `${embedBase}/embed-2/v3/e-1/getSources?id=${videoId}`,
             `${embedBase}/embed-2/v2/e-1/getSources?id=${videoId}`,
@@ -348,7 +432,7 @@ async function extractMegaCloudFromEmbed(embedUrl: string, key: string): Promise
         for (const sourcesUrl of sourcesUrls) {
             try {
                 console.log('[MegaCloud] Trying:', sourcesUrl);
-                const { data } = await axios.get(sourcesUrl, {
+                const { data } = await axios.get(getProxyUrl(sourcesUrl), {
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                         'Referer': 'https://megacloud.tv',
@@ -363,7 +447,7 @@ async function extractMegaCloudFromEmbed(embedUrl: string, key: string): Promise
                     let sourceUrl = data.sources;
                     
                     if (data.encrypted) {
-                        const decrypted = simpleDecrypt(sourceUrl, key);
+                        const decrypted = simpleDecrypt(sourceUrl, decryptionKey);
                         console.log('[MegaCloud] Decrypted:', decrypted.slice(0, 200));
                         try {
                             const parsed = JSON.parse(decrypted);
@@ -401,14 +485,16 @@ async function extractMegaCloudFromEmbed(embedUrl: string, key: string): Promise
                 }
             } catch (e) {
                 console.log('[MegaCloud] Failed URL:', sourcesUrl);
+                rotateProxy();
                 continue;
             }
         }
         
-        return null;
+        console.log('[MegaCloud] All extraction methods failed, returning embed URL as fallback');
+        return { url: embedUrl, type: 'm3u8', encrypted: false, embedUrl, referer: 'https://megacloud.tv' };
     } catch (error) {
         console.error('[MegaCloud] Extract from embed error:', error);
-        return null;
+        return { url: embedUrl, type: 'm3u8', encrypted: false, embedUrl, referer: 'https://megacloud.tv' };
     }
 }
 
@@ -418,30 +504,29 @@ async function extractMegaCloudSourceById(videoId: string): Promise<VideoSource 
         console.log('[MegaCloud] Client key:', clientKey);
         
         const sourcesUrls = [
-            `${PROXY_BASE}/https://megacloud.tv/embed-2/v2/e-1/getSources?id=${videoId}`,
-            `${PROXY_BASE}/https://megacloud.blog/embed-2/v2/e-1/getSources?id=${videoId}`,
-            `${PROXY_BASE}/https://megacloud.tv/embed-2/v3/e-1/getSources?id=${videoId}`,
-            `${PROXY_BASE}/https://megacloud.blog/embed-2/v3/e-1/getSources?id=${videoId}`,
-            `${PROXY_BASE}/https://megacloud.tv/embed-2/ajax/e-1/getSources?id=${videoId}`,
-            `${PROXY_BASE}/https://megacloud.blog/embed-2/ajax/e-1/getSources?id=${videoId}`,
+            `https://megacloud.tv/embed-2/v2/e-1/getSources?id=${videoId}`,
+            `https://megacloud.blog/embed-2/v2/e-1/getSources?id=${videoId}`,
+            `https://megacloud.tv/embed-2/v3/e-1/getSources?id=${videoId}`,
+            `https://megacloud.blog/embed-2/v3/e-1/getSources?id=${videoId}`,
+            `https://megacloud.tv/embed-2/ajax/e-1/getSources?id=${videoId}`,
+            `https://megacloud.blog/embed-2/ajax/e-1/getSources?id=${videoId}`,
         ];
         
         if (clientKey) {
             sourcesUrls.unshift(
-                `${PROXY_BASE}/https://megacloud.tv/embed-2/v2/e-1/getSources?id=${videoId}&_k=${clientKey}`,
-                `${PROXY_BASE}/https://megacloud.blog/embed-2/v2/e-1/getSources?id=${videoId}&_k=${clientKey}`,
-                `${PROXY_BASE}/https://megacloud.tv/embed-2/v3/e-1/getSources?id=${videoId}&_k=${clientKey}`,
-                `${PROXY_BASE}/https://megacloud.blog/embed-2/v3/e-1/getSources?id=${videoId}&_k=${clientKey}`,
+                `https://megacloud.tv/embed-2/v2/e-1/getSources?id=${videoId}&_k=${clientKey}`,
+                `https://megacloud.blog/embed-2/v2/e-1/getSources?id=${videoId}&_k=${clientKey}`,
+                `https://megacloud.tv/embed-2/v3/e-1/getSources?id=${videoId}&_k=${clientKey}`,
+                `https://megacloud.blog/embed-2/v3/e-1/getSources?id=${videoId}&_k=${clientKey}`,
             );
         }
         
         let data = null;
-        let usedUrl = '';
         
         for (const sourcesUrl of sourcesUrls) {
             try {
                 console.log('[MegaCloud] Trying URL:', sourcesUrl);
-                const { data: resData } = await axios.get(sourcesUrl, {
+                const response = await axios.get(getProxyUrl(sourcesUrl), {
                     headers: {
                         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                         'Referer': 'https://megacloud.tv',
@@ -449,11 +534,11 @@ async function extractMegaCloudSourceById(videoId: string): Promise<VideoSource 
                     },
                     timeout: 10000,
                 });
-                data = resData;
-                usedUrl = sourcesUrl;
+                data = response.data;
                 console.log('[MegaCloud] Success with URL:', sourcesUrl);
                 break;
             } catch (e) {
+                rotateProxy();
                 continue;
             }
         }
@@ -463,7 +548,6 @@ async function extractMegaCloudSourceById(videoId: string): Promise<VideoSource 
             return null;
         }
 
-        console.log('[MegaCloud] Using URL:', usedUrl);
         console.log('[MegaCloud] Data:', JSON.stringify(data).slice(0, 200));
 
         if (!data.encrypted) {
@@ -501,6 +585,112 @@ async function extractMegaCloudSourceById(videoId: string): Promise<VideoSource 
         };
     } catch (error) {
         console.error('[MegaCloud] API error:', error);
+        return { url: `https://megacloud.tv/embed-2/e-1/${videoId}`, type: 'm3u8', encrypted: false, embedUrl: `https://megacloud.tv/embed-2/e-1/${videoId}`, referer: 'https://megacloud.tv' };
+    }
+}
+
+async function extractTCloudSource(embedUrl: string): Promise<VideoSource | null> {
+    try {
+        console.log('[T-Cloud] Extracting from:', embedUrl);
+        
+        const videoIdMatch = embedUrl.match(/\/embed\/([^?\/]+)/);
+        if (!videoIdMatch) return null;
+        
+        const videoId = videoIdMatch[1];
+        const sourcesUrl = `https://t-cloud.live/ajax/embed-6/getSource?id=${videoId}`;
+        
+        const { data } = await axios.get(getProxyUrl(sourcesUrl), {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Referer': 'https://t-cloud.live',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            timeout: 10000,
+        });
+        
+        console.log('[T-Cloud] Response:', JSON.stringify(data).slice(0, 200));
+        
+        if (data.link) {
+            return {
+                url: data.link,
+                type: 'm3u8',
+                encrypted: false,
+                embedUrl,
+                referer: 'https://t-cloud.live',
+            };
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('[T-Cloud] Error:', error);
+        return null;
+    }
+}
+
+async function extractVidSrcSource(embedUrl: string): Promise<VideoSource | null> {
+    try {
+        console.log('[VidSrc] Extracting from:', embedUrl);
+        
+        const videoIdMatch = embedUrl.match(/\/embed\/([^?\/]+)/);
+        if (!videoIdMatch) return null;
+        
+        const videoId = videoIdMatch[1];
+        
+        const sourcesUrl = `https://vidsrc.nl/embed/${videoId}`;
+        const html = await fetchWithProxy(sourcesUrl, 'https://vidsrc.nl', 10000);
+        
+        if (!html) return null;
+        
+        const match = html.match(/file:\s*["']([^"']+\.m3u8[^"']*)["']/);
+        if (match && match[1]) {
+            return {
+                url: match[1],
+                type: 'm3u8',
+                encrypted: false,
+                embedUrl,
+                referer: 'https://vidsrc.nl',
+            };
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('[VidSrc] Error:', error);
+        return null;
+    }
+}
+
+async function extractDecoderSource(embedUrl: string): Promise<VideoSource | null> {
+    try {
+        console.log('[Decoder] Extracting from:', embedUrl);
+        
+        const videoIdMatch = embedUrl.match(/\/embed\/([^?\/]+)/);
+        if (!videoIdMatch) return null;
+        
+        const videoId = videoIdMatch[1];
+        const sourcesUrl = `https://decoder.to/ajax/embed-6/getSource?id=${videoId}`;
+        
+        const { data } = await axios.get(getProxyUrl(sourcesUrl), {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Referer': 'https://decoder.to',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            timeout: 10000,
+        });
+        
+        if (data.link) {
+            return {
+                url: data.link,
+                type: 'm3u8',
+                encrypted: false,
+                embedUrl,
+                referer: 'https://decoder.to',
+            };
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('[Decoder] Error:', error);
         return null;
     }
 }
@@ -508,7 +698,16 @@ async function extractMegaCloudSourceById(videoId: string): Promise<VideoSource 
 export function buildProxyUrl(directUrl: string, referer: string): string {
     const encodedUrl = encodeURIComponent(directUrl);
     const encodedReferer = encodeURIComponent(referer);
-    return `https://cdn.4animo.xyz/proxy/?url=${encodedUrl}&referer=${encodedReferer}`;
+    
+    if (directUrl.includes('.m3u8')) {
+        return `https://cdn.4animo.xyz/proxy/?url=${encodedUrl}&referer=${encodedReferer}`;
+    }
+    
+    if (directUrl.includes('megacloud') || directUrl.includes('t-cloud') || directUrl.includes('vidsrc') || directUrl.includes('decoder') || directUrl.includes('embed')) {
+        return `https://cdn.4animo.xyz/proxy/?url=${encodedUrl}&referer=${encodedReferer}`;
+    }
+    
+    return directUrl;
 }
 
 export function getIframeUrl(episodeId: string, language: 'sub' | 'dub' | 'hindi', animeTitle?: string, episodeNumber?: number): string {

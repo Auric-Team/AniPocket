@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         let proxyUrl = '';
         let isEncrypted = source.encrypted;
         
-        console.log('[API/Source] Initial URL:', directUrl, 'encrypted:', isEncrypted);
+        console.log('[API/Source] Initial URL:', directUrl, 'encrypted:', isEncrypted, 'referer:', source.referer);
         
         if (isEncrypted && directUrl) {
             console.log('[API/Source] URL is encrypted, attempting to decrypt...');
@@ -44,10 +44,21 @@ export async function POST(request: NextRequest) {
             }
         }
         
+        console.log('[API/Source] Before proxy - URL:', directUrl, 'includes m3u8:', directUrl?.includes('.m3u8'));
+        
+        const referer = source.referer || 'https://megacloud.tv';
+        
         if (directUrl && directUrl.includes('.m3u8')) {
-            proxyUrl = buildProxyUrl(directUrl, source.referer || 'https://megacloud.tv');
-            console.log('[API/Source] Built proxy URL:', proxyUrl);
+            proxyUrl = buildProxyUrl(directUrl, referer);
+            console.log('[API/Source] Built proxy URL for m3u8:', proxyUrl);
+        } else if (directUrl && (directUrl.includes('megacloud') || directUrl.includes('t-cloud') || directUrl.includes('vidsrc') || directUrl.includes('decoder') || directUrl.includes('embed'))) {
+            proxyUrl = buildProxyUrl(directUrl, referer);
+            console.log('[API/Source] Built proxy URL for embed:', proxyUrl);
+        } else {
+            console.log('[API/Source] NOT building proxy - conditions not met');
         }
+
+        console.log('[API/Source] Final - directUrl:', directUrl, 'proxyUrl:', proxyUrl, 'useIframe:', !proxyUrl || isEncrypted || !directUrl);
 
         return NextResponse.json({
             success: true,
