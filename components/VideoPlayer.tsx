@@ -1,23 +1,46 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { getEmbedUrl } from '@/lib/megaplay';
 import Link from 'next/link';
+
+interface VideoSource {
+    url: string;
+    proxyUrl: string;
+    type: 'm3u8' | 'mp4';
+    encrypted: boolean;
+    embedUrl: string;
+    referer: string;
+    sourceName?: string;
+}
 
 interface VideoPlayerProps {
     episodeId: string;
+    animeId: string;
     animeTitle: string;
     episodeNumber?: number;
     hasDub?: boolean;
     hasHindi?: boolean;
     nextEpisodeUrl?: string;
+    serverType?: 'sub' | 'dub';
 }
 
-export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasDub = false, hasHindi = false, nextEpisodeUrl }: VideoPlayerProps) {
+export default function VideoPlayer({ 
+    episodeId,
+    animeId,
+    animeTitle, 
+    episodeNumber, 
+    hasDub = false, 
+    hasHindi = false, 
+    nextEpisodeUrl,
+    serverType = 'sub'
+}: VideoPlayerProps) {
     const router = useRouter();
-    const [language, setLanguage] = useState<'sub' | 'dub' | 'hindi'>('sub');
+    const [language, setLanguage] = useState<'sub' | 'dub' | 'hindi'>(serverType);
     const [isLoading, setIsLoading] = useState(true);
+    const [videoSource, setVideoSource] = useState<VideoSource | null>(null);
+    const [useIframe, setUseIframe] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [showNextOverlay, setShowNextOverlay] = useState(false);
@@ -25,10 +48,50 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
     const [isHovered, setIsHovered] = useState(false);
 
     const AUTO_NEXT_TRIGGER_SECONDS = 1350;
+    const videoRef = useRef<HTMLVideoElement>(null);
 
-    const embedUrl = getEmbedUrl(episodeId, language, animeTitle, episodeNumber);
+    const fetchVideoSource = async () => {
+        setIsLoading(true);
+        setError(null);
+        
+        try {
+            const response = await fetch('/api/source', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    episodeId,
+                    serverType: language === 'hindi' ? 'sub' : language,
+                    animeId,
+                    episodeNumber
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.source && data.source.proxyUrl) {
+                setVideoSource(data.source);
+                setUseIframe(false);
+            } else {
+                setUseIframe(true);
+                setError(data.error || 'Direct source not available');
+            }
+        } catch (err) {
+            console.error('Error fetching source:', err);
+            setUseIframe(true);
+            setError('Failed to fetch video source');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    // Master Timer: Start counting seconds once the iframe loads
+    useEffect(() => {
+        fetchVideoSource();
+    }, [episodeId, language]);
+
+    const embedUrl = language === 'hindi' 
+        ? `https://letsembed.cc/embed/anime/?id=${animeTitle.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-')}/${episodeNumber}?al=hindi&autoplay=1`
+        : `https://megaplay.buzz/stream/s-2/${episodeId}/${language}?autoplay=1`;
+
     useEffect(() => {
         if (isLoading) return;
 
@@ -39,26 +102,21 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
         return () => clearInterval(timer);
     }, [isLoading]);
 
-    // Auto-Next Logic
     useEffect(() => {
         if (!nextEpisodeUrl || isLoading) return;
 
-        // Trigger the overlay
         if (timeElapsed === AUTO_NEXT_TRIGGER_SECONDS && !showNextOverlay) {
             setTimeout(() => setShowNextOverlay(true), 0);
         }
 
-        // Handle the countdown if overlay is active
         if (showNextOverlay && countdown > 0) {
             const down = setTimeout(() => setCountdown(c => c - 1), 1000);
             return () => clearTimeout(down);
         } else if (showNextOverlay && countdown === 0) {
-            // FIRE AUTO PLAY!
             router.push(nextEpisodeUrl);
         }
     }, [timeElapsed, showNextOverlay, countdown, nextEpisodeUrl, isLoading, router]);
 
-    // Reset loading state when episode changes
     useEffect(() => {
         setIsLoading(true);
         setTimeElapsed(0);
@@ -72,31 +130,48 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {/* Player Container */}
             <div className="relative w-full aspect-video bg-[#050505] overflow-hidden">
 
-                {/* Player Top Bar removed per user request */}
-
-                {/* Clean Loading Overlay */}
                 {isLoading && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#09090b] z-30">
                         <div className="w-10 h-10 border-2 border-white/10 border-t-[#FFB000] rounded-full animate-spin mb-4" />
-                        <span className="text-sm font-semibold text-[#a1a1aa] tracking-widest uppercase">Initializing Stream...</span>
+                        <span className="text-sm font-semibold text-[#a1a1aa] tracking-widest uppercase">Loading Stream...</span>
                     </div>
                 )}
 
-                {/* Video Player Frame */}
-                <iframe
-                    src={embedUrl}
-                    className="w-full h-full border-0 outline-none relative z-10"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                    loading="eager"
-                    title={`${animeTitle} Episode ${episodeNumber}`}
-                    onLoad={() => setIsLoading(false)}
-                />
+                {!isLoading && videoSource && !useIframe && (
+                    <video
+                        ref={videoRef}
+                        key={videoSource.proxyUrl}
+                        className="w-full h-full"
+                        controls
+                        autoPlay
+                        playsInline
+                        poster=""
+                        onLoadedData={() => setIsLoading(false)}
+                        onError={() => {
+                            console.log('Video error, falling back to iframe');
+                            setUseIframe(true);
+                        }}
+                    >
+                        <source src={videoSource.proxyUrl} type="application/x-mpegURL" />
+                        <source src={videoSource.url} type="application/x-mpegURL" />
+                        Your browser does not support video playback.
+                    </video>
+                )}
 
-                {/* PREMIUM AUTO-PLAY NEXT OVERLAY */}
+                {useIframe && (
+                    <iframe
+                        src={embedUrl}
+                        className="w-full h-full border-0 outline-none relative z-10"
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                        loading="eager"
+                        title={`${animeTitle} Episode ${episodeNumber}`}
+                        onLoad={() => setIsLoading(false)}
+                    />
+                )}
+
                 {showNextOverlay && nextEpisodeUrl && (
                     <div className="absolute bottom-6 right-6 z-40 bg-[#09090b]/90 backdrop-blur-md border border-white/10 p-5 rounded-xl shadow-2xl animate-in slide-in-from-right-8 duration-500 w-80">
                         <div className="flex justify-between items-start mb-3">
@@ -136,12 +211,11 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
                 )}
             </div>
 
-            {/* Simple Controls Bar */}
             <div className="flex items-center justify-between p-3.5 bg-[#18181b] border-t border-white/5">
                 <div className="flex items-center gap-4 text-xs font-semibold">
                     <div className="flex items-center bg-[#09090b] border border-white/10 rounded-full overflow-hidden p-1 shadow-inner">
                         <button
-                            onClick={() => { setLanguage('sub'); setIsLoading(true); }}
+                            onClick={() => { setLanguage('sub'); }}
                             className={`px-4 py-1.5 rounded-full transition-all ${language === 'sub'
                                 ? 'bg-[#f4f4f5] text-[#09090b] shadow-[0_2px_10px_rgba(255,255,255,0.1)] font-bold'
                                 : 'text-[#a1a1aa] hover:text-white hover:bg-white/5'
@@ -150,7 +224,7 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
                             SUB
                         </button>
                         <button
-                            onClick={() => { if (hasDub) { setLanguage('dub'); setIsLoading(true); } }}
+                            onClick={() => { if (hasDub) { setLanguage('dub'); } }}
                             disabled={!hasDub}
                             className={`px-4 py-1.5 rounded-full transition-all ${language === 'dub'
                                 ? 'bg-[#f4f4f5] text-[#09090b] shadow-[0_2px_10px_rgba(255,255,255,0.1)] font-bold'
@@ -163,7 +237,7 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
                             DUB
                         </button>
                         <button
-                            onClick={() => { setLanguage('hindi'); setIsLoading(true); }}
+                            onClick={() => { setLanguage('hindi'); }}
                             className={`px-4 py-1.5 rounded-full transition-all ${language === 'hindi'
                                 ? 'bg-[#FFB000] text-[#09090b] shadow-[0_2px_10px_rgba(255,176,0,0.3)] font-bold'
                                 : 'text-[#a1a1aa] hover:text-white hover:bg-white/5'
@@ -176,10 +250,14 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
                 </div>
 
                 <div className="flex items-center gap-2">
-                    {/* Simulated Skip Intro - purely visual flex if they click it they just sync the timer ahead */}
                     {timeElapsed > 30 && timeElapsed < 120 && (
                         <button
-                            onClick={() => setTimeElapsed(120)}
+                            onClick={() => {
+                                if (videoRef.current) {
+                                    videoRef.current.currentTime = videoRef.current.currentTime + 90;
+                                }
+                                setTimeElapsed(120);
+                            }}
                             className="mr-4 px-4 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-full text-xs font-semibold border border-white/5 transition-colors flex items-center gap-1 animate-in fade-in"
                         >
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
@@ -187,7 +265,7 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
                         </button>
                     )}
                     <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#a1a1aa]">
-                        Powered by <span className="text-[#FFB000]">MegaPlay</span>
+                        {videoSource?.sourceName || 'Direct'} CDN
                     </span>
                 </div>
             </div >
