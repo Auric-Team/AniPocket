@@ -23,10 +23,35 @@ export default function VideoPlayer({ episodeId, animeTitle, episodeNumber, hasD
     const [showNextOverlay, setShowNextOverlay] = useState(false);
     const [countdown, setCountdown] = useState(10);
     const [isHovered, setIsHovered] = useState(false);
+    const [hindiUrl, setHindiUrl] = useState<string | null>(null);
 
     const AUTO_NEXT_TRIGGER_SECONDS = 1350;
 
-    const embedUrl = getEmbedUrl(episodeId, language, animeTitle, episodeNumber);
+    useEffect(() => {
+        if (language === 'hindi') {
+            let isMounted = true;
+            const fetchHindi = async () => {
+                setIsLoading(true);
+                try {
+                    const res = await fetch(`/api/hindi?title=${encodeURIComponent(animeTitle)}&ep=${episodeNumber || 1}`);
+                    const data = await res.json();
+                    if (isMounted && data.url) {
+                        setHindiUrl(data.url);
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch hindi source:", e);
+                } finally {
+                    if (isMounted) setIsLoading(false);
+                }
+            };
+            fetchHindi();
+            return () => { isMounted = false; };
+        } else {
+            setHindiUrl(null);
+        }
+    }, [language, animeTitle, episodeNumber]);
+
+    const embedUrl = language === 'hindi' && hindiUrl ? hindiUrl : getEmbedUrl(episodeId, language, animeTitle, episodeNumber);
 
     // Master Timer: Start counting seconds once the iframe loads
     useEffect(() => {
