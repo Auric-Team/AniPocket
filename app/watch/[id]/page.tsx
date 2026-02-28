@@ -97,6 +97,7 @@ export default async function WatchPage({
                             <div className="bg-[#09090b] overflow-hidden rounded-t-xl shadow-[0_0_50px_rgba(255,176,0,0.05)] border border-white/5 relative z-10 transition-all duration-500 hover:shadow-[0_0_50px_rgba(255,176,0,0.1)]">
                                 <VideoPlayer
                                     episodeId={currentEpId}
+                                    animeId={id}
                                     animeTitle={anime.title}
                                     episodeNumber={episodeNumber}
                                     hasDub={hasDub}
