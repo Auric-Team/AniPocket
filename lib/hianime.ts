@@ -1,11 +1,6 @@
-import axios from 'axios';
 import { Anime, AnimeDetails, Episode, AdvancedSearchFilters, PageResult } from './types';
 
 const API_BASE = 'https://api.tatakai.me/api/v1/hianime';
-
-const client = axios.create({
-    timeout: 30000,
-});
 
 function mapAnime(item: any): Anime {
     if (!item) return {} as Anime;
@@ -25,95 +20,74 @@ function mapAnime(item: any): Anime {
 
 export async function getSpotlightAnime(): Promise<Anime[]> {
     try {
-        const { data } = await client.get(`${API_BASE}/home`);
-        if (data.status !== 200 || !data.data?.spotlightAnimes) return [];
-        return data.data.spotlightAnimes.map(mapAnime);
-    } catch (error) {
-        console.error('[AniPocket] Error fetching spotlight:', error);
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/home`, { next: { revalidate: 3600 } });
+        const data = await res.json();
+        return data.data?.spotlightAnimes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function getTrendingAnime(): Promise<Anime[]> {
     try {
-        const { data } = await client.get(`${API_BASE}/home`);
-        if (data.status !== 200 || !data.data?.trendingAnimes) return [];
-        return data.data.trendingAnimes.map(mapAnime);
-    } catch (error) {
-        console.error('[AniPocket] Error fetching trending:', error);
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/home`, { next: { revalidate: 3600 } });
+        const data = await res.json();
+        return data.data?.trendingAnimes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function getLatestEpisodeAnime(): Promise<Anime[]> {
     try {
-        const { data } = await client.get(`${API_BASE}/home`);
-        if (data.status !== 200 || !data.data?.latestEpisodeAnimes) return [];
-        return data.data.latestEpisodeAnimes.map(mapAnime);
-    } catch (error) {
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/home`, { next: { revalidate: 3600 } });
+        const data = await res.json();
+        return data.data?.latestEpisodeAnimes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function getTopAiringAnime(): Promise<Anime[]> {
     try {
-        const { data } = await client.get(`${API_BASE}/home`);
-        if (data.status !== 200 || !data.data?.topAiringAnimes) return [];
-        return data.data.topAiringAnimes.map(mapAnime);
-    } catch (error) {
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/home`, { next: { revalidate: 3600 } });
+        const data = await res.json();
+        return data.data?.topAiringAnimes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function getMostPopularAnime(): Promise<Anime[]> {
     try {
-        const { data } = await client.get(`${API_BASE}/category/most-popular`);
-        if (data.status !== 200 || !data.data?.animes) return [];
-        return data.data.animes.map(mapAnime);
-    } catch (error) {
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/category/most-popular`, { next: { revalidate: 3600 } });
+        const data = await res.json();
+        return data.data?.animes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function getMostFavoriteAnime(): Promise<Anime[]> {
     try {
-        const { data } = await client.get(`${API_BASE}/category/most-favorite`);
-        if (data.status !== 200 || !data.data?.animes) return [];
-        return data.data.animes.map(mapAnime);
-    } catch (error) {
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/category/most-favorite`, { next: { revalidate: 3600 } });
+        const data = await res.json();
+        return data.data?.animes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function getLatestCompletedAnime(): Promise<Anime[]> {
     try {
-        const { data } = await client.get(`${API_BASE}/category/completed`);
-        if (data.status !== 200 || !data.data?.animes) return [];
-        return data.data.animes.map(mapAnime);
-    } catch (error) {
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/category/completed`, { next: { revalidate: 3600 } });
+        const data = await res.json();
+        return data.data?.animes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function getAnimeByCategory(category: string): Promise<Anime[]> {
     try {
-        const cleanCategory = category.replace(/^\//, '');
-        const { data } = await client.get(`${API_BASE}/category/${cleanCategory}`);
-        if (data.status !== 200 || !data.data?.animes) return [];
-        return data.data.animes.map(mapAnime);
-    } catch (error) {
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/category/${category.replace(/^\//, '')}`, { next: { revalidate: 3600 } });
+        const data = await res.json();
+        return data.data?.animes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function searchAnime(query: string): Promise<Anime[]> {
     try {
-        const { data } = await client.get(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
-        if (data.status !== 200 || !data.data?.animes) return [];
-        return data.data.animes.map(mapAnime);
-    } catch (error) {
-        return [];
-    }
+        const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        return data.data?.animes?.map(mapAnime) || [];
+    } catch (error) { return []; }
 }
 
 export async function getAdvancedSearchAnime(filters: AdvancedSearchFilters): Promise<PageResult<Anime>> {
@@ -126,16 +100,14 @@ export async function getAdvancedSearchAnime(filters: AdvancedSearchFilters): Pr
         if (filters.genres) queryParams.append('genres', filters.genres);
         if (filters.page) queryParams.append('page', filters.page.toString());
 
-        const { data } = await client.get(`${API_BASE}/search?${queryParams.toString()}`);
-        if (data.status !== 200 || !data.data?.animes) {
-            return { animes: [], totalPages: 1, hasNextPage: false, currentPage: filters.page || 1 };
-        }
+        const res = await fetch(`${API_BASE}/search?${queryParams.toString()}`);
+        const data = await res.json();
         
         return {
-            animes: data.data.animes.map(mapAnime),
-            totalPages: data.data.totalPages || 1,
-            hasNextPage: data.data.hasNextPage || false,
-            currentPage: data.data.currentPage || 1
+            animes: data.data?.animes?.map(mapAnime) || [],
+            totalPages: data.data?.totalPages || 1,
+            hasNextPage: data.data?.hasNextPage || false,
+            currentPage: data.data?.currentPage || filters.page || 1
         };
     } catch (error) {
         return { animes: [], totalPages: 1, hasNextPage: false, currentPage: filters.page || 1 };
@@ -145,15 +117,18 @@ export async function getAdvancedSearchAnime(filters: AdvancedSearchFilters): Pr
 export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | null> {
     try {
         const [infoRes, epRes] = await Promise.all([
-            client.get(`${API_BASE}/anime/${animeId}`),
-            client.get(`${API_BASE}/anime/${animeId}/episodes`)
+            fetch(`${API_BASE}/anime/${animeId}`, { cache: 'no-store' }),
+            fetch(`${API_BASE}/anime/${animeId}/episodes`, { cache: 'no-store' })
         ]);
 
-        if (infoRes.data.status !== 200 || !infoRes.data.data?.anime) return null;
+        const infoJson = await infoRes.json();
+        const epJson = await epRes.json();
 
-        const info = infoRes.data.data.anime.info;
-        const moreInfo = infoRes.data.data.anime.moreInfo;
-        const episodes = epRes.data.data?.episodes?.map((ep: any) => ({
+        if (infoJson.status !== 200 || !infoJson.data?.anime) return null;
+
+        const info = infoJson.data.anime.info;
+        const moreInfo = infoJson.data.anime.moreInfo;
+        const episodes = epJson.data?.episodes?.map((ep: any) => ({
             id: ep.episodeId,
             number: ep.number,
             title: ep.title,
@@ -165,7 +140,7 @@ export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | n
             title: info.name,
             image: info.poster,
             synopsis: info.description,
-            genres: moreInfo.genres,
+            genres: moreInfo.genres || [],
             status: moreInfo.status,
             type: moreInfo.type,
             episodeList: episodes,
@@ -175,24 +150,18 @@ export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | n
             },
             totalEpisodes: episodes.length,
         };
-    } catch (error) {
-        console.error('[AniPocket] Error fetching details:', error);
-        return null;
-    }
+    } catch (error) { return null; }
 }
 
 export async function getEpisodeServers(episodeId: string): Promise<{ sub: boolean; dub: boolean; hindi: boolean }> {
     try {
-        const { data } = await client.get(`${API_BASE}/episode/servers?animeEpisodeId=${encodeURIComponent(episodeId)}`);
+        const res = await fetch(`${API_BASE}/episode/servers?animeEpisodeId=${encodeURIComponent(episodeId)}`, { cache: 'no-store' });
+        const data = await res.json();
         if (data.status !== 200 || !data.data) return { sub: true, dub: false, hindi: true };
-        const servers = data.data;
-        
         return {
-            sub: servers.sub?.length > 0,
-            dub: servers.dub?.length > 0,
+            sub: data.data.sub?.length > 0,
+            dub: data.data.dub?.length > 0,
             hindi: true
         };
-    } catch (error) {
-        return { sub: true, dub: false, hindi: true };
-    }
+    } catch (error) { return { sub: true, dub: false, hindi: true }; }
 }

@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
     if (!title) return NextResponse.json({ error: 'Missing title' }, { status: 400 });
 
     try {
-        // Advanced normalization for 1000% accuracy
         const cleanTitle = title
             .replace(/\(TV\)/gi, '')
             .replace(/Season \d+/gi, '')
@@ -19,25 +18,23 @@ export async function GET(req: NextRequest) {
 
         const titleSlug = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         
-        console.log(`[Hindi Route] Syncing: ${titleSlug} ep ${ep}`);
-        
-        const response = await fetch(`${TATAKAI_URL}/api/v1/animelok/watch/${encodeURIComponent(titleSlug)}?ep=${ep}`, {
+        // 1. Initial attempt with cleaned title
+        let response = await fetch(`${TATAKAI_URL}/api/v1/animelok/watch/${encodeURIComponent(titleSlug)}?ep=${ep}`, {
             signal: AbortSignal.timeout(25000),
         });
 
         let data;
         if (!response.ok) {
+             // 2. Fallback with raw title slug
              const fullSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-             const retryResponse = await fetch(`${TATAKAI_URL}/api/v1/animelok/watch/${encodeURIComponent(fullSlug)}?ep=${ep}`);
-             if (!retryResponse.ok) return NextResponse.json({ error: 'Animelok Sync Failed' }, { status: 404 });
-             data = await retryResponse.json();
-        } else {
-             data = await response.json();
+             response = await fetch(`${TATAKAI_URL}/api/v1/animelok/watch/${encodeURIComponent(fullSlug)}?ep=${ep}`);
+             if (!response.ok) return NextResponse.json({ error: 'Sync failed' }, { status: 404 });
         }
-
+        
+        data = await response.json();
         const servers = data.data?.servers || [];
         
-        // Accurate server selection: Multi > Hindi > others
+        // Accurate selection
         let selectedServer = servers.find((s: any) => 
             (s.name?.toLowerCase() === "multi" || s.tip?.toLowerCase() === "multi") && !s.tip?.toLowerCase().includes("abyess")
         );
@@ -51,11 +48,9 @@ export async function GET(req: NextRequest) {
         if (!selectedServer) selectedServer = servers.find((s: any) => s.language?.toLowerCase().includes("hindi"));
         if (!selectedServer && servers.length > 0) selectedServer = servers[0];
 
-        if (!selectedServer || !selectedServer.url) {
-             return NextResponse.json({ error: 'No Hindi server found' }, { status: 404 });
-        }
+        if (!selectedServer || !selectedServer.url) return NextResponse.json({ error: 'Source not found' }, { status: 404 });
 
-        // CRITICAL FIX: Replace localhost with production domain for proxies
+        // Correct localhost URLs from hosted API
         let finalUrl = selectedServer.url;
         if (finalUrl.includes('localhost:4000')) {
             finalUrl = finalUrl.replace(/http:\/\/localhost:4000/g, TATAKAI_URL);
@@ -67,7 +62,6 @@ export async function GET(req: NextRequest) {
             title: data.data?.animeTitle || title
         });
     } catch (e) {
-        console.error("[Hindi Route] Error:", e);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: 'Server Error' }, { status: 500 });
     }
 }

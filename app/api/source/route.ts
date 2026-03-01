@@ -4,12 +4,20 @@ export async function GET(request: NextRequest) {
     const episodeId = request.nextUrl.searchParams.get('episodeId');
     const type = (request.nextUrl.searchParams.get('type') || 'sub') as 'sub' | 'dub';
 
-    if (!episodeId) return NextResponse.json({ error: 'Missing episodeId' }, { status: 400 });
+    if (!episodeId) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
     try {
-        // We use megaplay.buzz which is a reliable wrapper for HiAnime/Zoro streams.
-        // It provides the best UI and handles multiple servers/subtitles internally.
-        const embedUrl = `https://megaplay.buzz/stream/s-2/${encodeURIComponent(episodeId)}/${type}?autoplay=1`;
+        // Extract the numeric part (data-id) from the Tatakai episodeId
+        // Example: "one-piece-100?ep=107149" -> "107149"
+        const match = episodeId.match(/[?&]ep=(\d+)/);
+        const numericId = match ? match[1] : episodeId;
+        
+        console.log(`[Source] Redirecting Zoro: ${numericId} (${type})`);
+
+        // Use the most stable embed provider for Zoro/HiAnime content
+        // This handles sub/dub and servers perfectly
+        const embedUrl = `https://megaplay.buzz/stream/s-2/${numericId}/${type}?autoplay=1`;
+        
         return NextResponse.redirect(embedUrl);
     } catch (e) {
         return NextResponse.redirect(`https://megaplay.buzz/stream/s-2/${episodeId}/${type}?autoplay=1`);
