@@ -1,341 +1,178 @@
-// HiAnime.to data provider - 100% realtime data via proxy
 import axios from 'axios';
-import * as cheerio from 'cheerio';
 import { Anime, AnimeDetails, Episode, AdvancedSearchFilters, PageResult } from './types';
 
-// Proxy configuration
-const PROXY_BASE = 'https://cors.eu.org';
-const HIANIME_URL = 'https://hianime.to';
+const API_BASE = 'https://api.tatakai.me/api/v1/hianime';
 
-// Helper to create proxied URL
-function proxyUrl(path: string): string {
-    return `${PROXY_BASE}/${HIANIME_URL}${path}`;
-}
-
-// Helper to convert any HiAnime image URL to a 300x400 poster
-function toPosterUrl(url: string): string {
-    if (!url) return '';
-    // Replace any dimension pattern (e.g., 1366x768, 1920x1080) with 300x400
-    return url.replace(/\/thumbnail\/\d+x\d+\//, '/thumbnail/300x400/');
-}
-
-// Create axios client
 const client = axios.create({
     timeout: 30000,
-    headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    },
 });
 
-// Helper to parse standard anime items (Grid view)
-function parseAnimeItems($: cheerio.CheerioAPI, selector: string): Anime[] {
-    const anime: Anime[] = [];
-    $(selector).each((_, el) => {
-        const $el = $(el);
-        const $link = $el.find('.film-poster a').first();
-        const $img = $el.find('.film-poster img').first();
-        const href = $link.attr('href') || '';
-        const id = href.split('/').pop()?.split('?')[0] || '';
-        if (id && !anime.find(a => a.id === id)) {
-            const type = $el.find('.fdi-item').first().text().trim() || 'TV';
-
-            // Ensure episodes is treated properly
-            const episodes: { sub: number | undefined; dub: number | undefined } = {
-                sub: parseInt($el.find('.tick-sub').text().replace(/\s/g, '')) || undefined,
-                dub: parseInt($el.find('.tick-dub').text().replace(/\s/g, '')) || undefined,
-            };
-            anime.push({
-                id,
-                title: $link.attr('title') || $img.attr('alt') || $el.find('.film-name').text().trim() || 'Unknown',
-                image: $img.attr('data-src') || $img.attr('src') || '',
-                type,
-                episodes,
-            });
-        }
-    });
-    return anime;
+function mapAnime(item: any): Anime {
+    if (!item) return {} as Anime;
+    return {
+        id: item.id || item.animeId || '',
+        title: item.name || item.title || 'Unknown',
+        image: item.poster || item.image || '',
+        type: item.type || 'TV',
+        episodes: {
+            sub: item.episodes?.sub || (item.stats?.episodes?.sub !== undefined ? parseInt(item.stats.episodes.sub) : undefined),
+            dub: item.episodes?.dub || (item.stats?.episodes?.dub !== undefined ? parseInt(item.stats.episodes.dub) : undefined),
+        },
+        synopsis: item.description || item.synopsis || '',
+        rank: item.rank,
+    };
 }
 
-// 1. Spotlight (Hero Slider)
 export async function getSpotlightAnime(): Promise<Anime[]> {
     try {
-        console.log('[AniPocket] Fetching Spotlight...');
-        const { data } = await client.get(proxyUrl('/home'));
-        const $ = cheerio.load(data);
-        const anime: Anime[] = [];
-
-        $('#slider .swiper-slide').each((_, el) => {
-            const $el = $(el);
-            const $content = $el.find('.deslide-item-content');
-            const $img = $el.find('.film-poster-img');
-
-            const watchLink = $content.find('.desi-buttons a').last().attr('href');
-            const id = watchLink?.split('/').pop()?.split('?')[0] || '';
-
-            if (id) {
-                const subText = $content.find('.tick-sub').text().trim();
-                const dubText = $content.find('.tick-dub').text().trim();
-                const bannerImage = $img.attr('data-src') || $img.attr('src') || '';
-
-                // Use robust regex replacer
-                const posterImage = toPosterUrl(bannerImage);
-
-                anime.push({
-                    id,
-                    title: $content.find('.desi-head-title').text().trim(),
-                    image: bannerImage,
-                    poster: posterImage,
-                    synopsis: $content.find('.desi-description').text().trim(),
-                    type: $content.find('.scd-item').first().text().trim() || 'TV',
-                    episodes: {
-                        sub: parseInt(subText) || undefined,
-                        dub: parseInt(dubText) || undefined,
-                    },
-                });
-            }
-        });
-        return anime;
+        const { data } = await client.get(`${API_BASE}/home`);
+        if (data.status !== 200 || !data.data?.spotlightAnimes) return [];
+        return data.data.spotlightAnimes.map(mapAnime);
     } catch (error) {
         console.error('[AniPocket] Error fetching spotlight:', error);
         return [];
     }
 }
 
-// 2. Trending (Ranked List #trending-home)
 export async function getTrendingAnime(): Promise<Anime[]> {
     try {
-        console.log('[AniPocket] Fetching Trending...');
-        const { data } = await client.get(proxyUrl('/home'));
-        const $ = cheerio.load(data);
-        const anime: Anime[] = [];
-
-        $('#trending-home .swiper-slide').each((i, el) => {
-            const $el = $(el);
-
-            // FIX: The anchor tag IS the .film-poster element, not a child of it
-            let $link = $el.find('.film-poster');
-            if ($link.length === 0 || !$link.is('a')) {
-                // Fallback: try finding 'a' inside if structure changes
-                $link = $el.find('.film-poster a');
-            }
-
-            const $img = $el.find('img'); // Just find any img inside
-
-            const id = $link.attr('href')?.split('/').pop()?.split('?')[0] || '';
-
-            const rank = parseInt($el.find('.number span').text().trim()) || i + 1;
-            const title = $el.find('.film-title').text().trim() || $el.find('.dynamic-name').text().trim();
-            const image = $img.attr('data-src') || $img.attr('src') || '';
-
-            if (id) {
-                anime.push({
-                    id,
-                    title,
-                    image,
-                    rank: rank,
-                    type: 'TV'
-                });
-            }
-        });
-
-        console.log(`[AniPocket] Found ${anime.length} trending items`);
-        return anime;
+        const { data } = await client.get(`${API_BASE}/home`);
+        if (data.status !== 200 || !data.data?.trendingAnimes) return [];
+        return data.data.trendingAnimes.map(mapAnime);
     } catch (error) {
         console.error('[AniPocket] Error fetching trending:', error);
         return [];
     }
 }
 
-// 3. Latest Episodes
 export async function getLatestEpisodeAnime(): Promise<Anime[]> {
     try {
-        console.log('[AniPocket] Fetching Latest Episodes...');
-        const { data } = await client.get(proxyUrl('/home'));
-        const $ = cheerio.load(data);
-        return parseAnimeItems($, '.film_list-wrap .flw-item').slice(0, 24);
+        const { data } = await client.get(`${API_BASE}/home`);
+        if (data.status !== 200 || !data.data?.latestEpisodeAnimes) return [];
+        return data.data.latestEpisodeAnimes.map(mapAnime);
     } catch (error) {
         return [];
     }
 }
 
-// 4. Top Airing
 export async function getTopAiringAnime(): Promise<Anime[]> {
     try {
-        console.log('[AniPocket] Fetching Top Airing...');
-        const { data } = await client.get(proxyUrl('/top-airing'));
-        const $ = cheerio.load(data);
-        return parseAnimeItems($, '.film_list-wrap .flw-item');
+        const { data } = await client.get(`${API_BASE}/home`);
+        if (data.status !== 200 || !data.data?.topAiringAnimes) return [];
+        return data.data.topAiringAnimes.map(mapAnime);
     } catch (error) {
         return [];
     }
 }
 
-// 5. Most Popular
 export async function getMostPopularAnime(): Promise<Anime[]> {
     try {
-        console.log('[AniPocket] Fetching Most Popular...');
-        const { data } = await client.get(proxyUrl('/most-popular'));
-        const $ = cheerio.load(data);
-        return parseAnimeItems($, '.film_list-wrap .flw-item');
+        const { data } = await client.get(`${API_BASE}/category/most-popular`);
+        if (data.status !== 200 || !data.data?.animes) return [];
+        return data.data.animes.map(mapAnime);
     } catch (error) {
         return [];
     }
 }
 
-// 6. Most Favorite
 export async function getMostFavoriteAnime(): Promise<Anime[]> {
     try {
-        console.log('[AniPocket] Fetching Most Favorite...');
-        const { data } = await client.get(proxyUrl('/most-favorite'));
-        const $ = cheerio.load(data);
-        return parseAnimeItems($, '.film_list-wrap .flw-item');
+        const { data } = await client.get(`${API_BASE}/category/most-favorite`);
+        if (data.status !== 200 || !data.data?.animes) return [];
+        return data.data.animes.map(mapAnime);
     } catch (error) {
         return [];
     }
 }
 
-// 7. Latest Completed
 export async function getLatestCompletedAnime(): Promise<Anime[]> {
     try {
-        console.log('[AniPocket] Fetching Latest Completed...');
-        const { data } = await client.get(proxyUrl('/completed'));
-        const $ = cheerio.load(data);
-        return parseAnimeItems($, '.film_list-wrap .flw-item');
+        const { data } = await client.get(`${API_BASE}/category/completed`);
+        if (data.status !== 200 || !data.data?.animes) return [];
+        return data.data.animes.map(mapAnime);
     } catch (error) {
         return [];
     }
 }
 
-// Generic: Get anime by category
 export async function getAnimeByCategory(category: string): Promise<Anime[]> {
     try {
-        const path = category.startsWith('/') ? category : `/${category}`;
-        console.log(`[AniPocket] Fetching category: ${path}`);
-        const { data } = await client.get(proxyUrl(path));
-        const $ = cheerio.load(data);
-        return parseAnimeItems($, '.film_list-wrap .flw-item');
+        const cleanCategory = category.replace(/^\//, '');
+        const { data } = await client.get(`${API_BASE}/category/${cleanCategory}`);
+        if (data.status !== 200 || !data.data?.animes) return [];
+        return data.data.animes.map(mapAnime);
     } catch (error) {
-        console.error(`[AniPocket] Error fetching category ${category}:`, error);
         return [];
     }
 }
 
-// Search anime (Basic)
 export async function searchAnime(query: string): Promise<Anime[]> {
     try {
-        console.log(`[AniPocket] Searching for: ${query}`);
-        const { data } = await client.get(proxyUrl(`/search?keyword=${encodeURIComponent(query)}`));
-        const $ = cheerio.load(data);
-        return parseAnimeItems($, '.film_list-wrap .flw-item');
+        const { data } = await client.get(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+        if (data.status !== 200 || !data.data?.animes) return [];
+        return data.data.animes.map(mapAnime);
     } catch (error) {
         return [];
     }
 }
 
-// Advanced Search & Filter (Paginated)
 export async function getAdvancedSearchAnime(filters: AdvancedSearchFilters): Promise<PageResult<Anime>> {
     try {
         const queryParams = new URLSearchParams();
-        if (filters.keyword) queryParams.append('keyword', filters.keyword);
+        if (filters.keyword) queryParams.append('q', filters.keyword);
         if (filters.type) queryParams.append('type', filters.type);
         if (filters.status) queryParams.append('status', filters.status);
         if (filters.sort) queryParams.append('sort', filters.sort);
         if (filters.genres) queryParams.append('genres', filters.genres);
         if (filters.page) queryParams.append('page', filters.page.toString());
 
-        const url = `/filter?${queryParams.toString()}`;
-        console.log(`[AniPocket] Fetching advanced search: ${url}`);
-
-        const { data } = await client.get(proxyUrl(url));
-        const $ = cheerio.load(data);
-
-        const animes = parseAnimeItems($, '.film_list-wrap .flw-item');
-
-        let totalPages = 1;
-        let hasNextPage = false;
-        const currentPage = filters.page || 1;
-
-        const $pagination = $('.pagination');
-        if ($pagination.length > 0) {
-            const $lastPage = $pagination.find('a.page-link').not('[title="Next"], [title="Prev"]').last();
-            if ($lastPage.length > 0) {
-                totalPages = parseInt($lastPage.attr('href')?.match(/page=(\d+)/)?.[1] || '1') || 1;
-            }
-            // Check for next button
-            if ($pagination.find('a[title="Next"], a:contains("Next")').length > 0) {
-                hasNextPage = true;
-            }
+        const { data } = await client.get(`${API_BASE}/search?${queryParams.toString()}`);
+        if (data.status !== 200 || !data.data?.animes) {
+            return { animes: [], totalPages: 1, hasNextPage: false, currentPage: filters.page || 1 };
         }
-
+        
         return {
-            animes,
-            totalPages,
-            hasNextPage,
-            currentPage
+            animes: data.data.animes.map(mapAnime),
+            totalPages: data.data.totalPages || 1,
+            hasNextPage: data.data.hasNextPage || false,
+            currentPage: data.data.currentPage || 1
         };
     } catch (error) {
-        console.error('[AniPocket] Error fetching advanced search:', error);
         return { animes: [], totalPages: 1, hasNextPage: false, currentPage: filters.page || 1 };
     }
 }
 
-// Get anime details
 export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | null> {
     try {
-        console.log(`[AniPocket] Getting details for: ${animeId}`);
-        const { data: pageData } = await client.get(proxyUrl(`/${animeId}`));
-        const $ = cheerio.load(pageData);
+        const [infoRes, epRes] = await Promise.all([
+            client.get(`${API_BASE}/anime/${animeId}`),
+            client.get(`${API_BASE}/anime/${animeId}/episodes`)
+        ]);
 
-        const title = $('.anisc-detail .film-name').text().trim() || $('h2.film-name').text().trim() || 'Unknown';
-        const image = $('.film-poster img').attr('src') || '';
-        const synopsis = $('.film-description .text').text().trim() || '';
+        if (infoRes.data.status !== 200 || !infoRes.data.data?.anime) return null;
 
-        const genres: string[] = [];
-        // FIX: Wrap push in curly braces to avoid returning number
-        $('.item-list a[href*="/genre/"]').each((_, el) => {
-            genres.push($(el).text().trim());
-        });
-
-        const statusText = $('.item-list').text();
-        const status = statusText.includes('Airing') ? 'Ongoing' : 'Completed';
-
-        const subCount = parseInt($('.film-stats .tick .tick-item.tick-sub').text().trim()) || 0;
-        const dubCount = parseInt($('.film-stats .tick .tick-item.tick-dub').text().trim()) || 0;
-
-        const dataId = $('[data-id]').first().attr('data-id') || $('.film-buttons a[data-id]').attr('data-id') || '';
-
-        const episodes: Episode[] = [];
-        if (dataId) {
-            const ajaxUrl = `${PROXY_BASE}/${HIANIME_URL}/ajax/v2/episode/list/${dataId}`;
-            const { data: epData } = await client.get(ajaxUrl);
-            const epHtml = typeof epData === 'string' ? epData : epData.html || '';
-            const $eps = cheerio.load(epHtml);
-
-            $eps('.ep-item, a.ep-item').each((_, el) => {
-                const $ep = $eps(el);
-                const epId = $ep.attr('data-id') || $ep.attr('href')?.match(/ep=(\d+)/)?.[1] || '';
-                const epNum = parseInt($ep.attr('data-number') || $ep.text().trim() || '0');
-                const epTitle = $ep.attr('title') || `Episode ${epNum}`;
-                const isFiller = $ep.hasClass('ssl-item-filler');
-
-                if (epId && epNum > 0) {
-                    episodes.push({ id: epId, number: epNum, title: epTitle, isFiller });
-                }
-            });
-            episodes.sort((a, b) => a.number - b.number);
-        }
+        const info = infoRes.data.data.anime.info;
+        const moreInfo = infoRes.data.data.anime.moreInfo;
+        const episodes = epRes.data.data?.episodes?.map((ep: any) => ({
+            id: ep.episodeId,
+            number: ep.number,
+            title: ep.title,
+            isFiller: ep.isFiller
+        })) || [];
 
         return {
-            id: animeId,
-            title,
-            image,
-            synopsis,
-            genres,
-            status,
-            type: 'TV',
+            id: info.id || animeId,
+            title: info.name,
+            image: info.poster,
+            synopsis: info.description,
+            genres: moreInfo.genres,
+            status: moreInfo.status,
+            type: moreInfo.type,
             episodeList: episodes,
-            episodes: { sub: subCount, dub: dubCount },
+            episodes: {
+                sub: parseInt(info.stats?.episodes?.sub) || 0,
+                dub: parseInt(info.stats?.episodes?.dub) || 0
+            },
             totalEpisodes: episodes.length,
         };
     } catch (error) {
@@ -344,33 +181,18 @@ export async function getAnimeDetails(animeId: string): Promise<AnimeDetails | n
     }
 }
 
-// Check episode server availability
 export async function getEpisodeServers(episodeId: string): Promise<{ sub: boolean; dub: boolean; hindi: boolean }> {
     try {
-        const ajaxUrl = `${PROXY_BASE}/${HIANIME_URL}/ajax/v2/episode/servers?episodeId=${episodeId}`;
-        const { data } = await client.get(ajaxUrl);
-        const html = typeof data === 'string' ? data : data.html || '';
-        const $ = cheerio.load(html);
-
-        const sub = $('.item.server-item[data-type="sub"]').length > 0;
-        const dub = $('.item.server-item[data-type="dub"]').length > 0;
-
-        let hindi = $('.item.server-item[data-type="hindi"]').length > 0;
-
-        if (!hindi) {
-            $('.item.server-item').each((_, el) => {
-                const serverText = $(el).text().toLowerCase();
-                const serverType = $(el).attr('data-type')?.toLowerCase() || '';
-                if (serverText.includes('hindi') || serverType.includes('hindi') || serverType === 'hin') {
-                    hindi = true;
-                    return false;
-                }
-            });
-        }
-
-        return { sub, dub, hindi: true };
+        const { data } = await client.get(`${API_BASE}/episode/servers?animeEpisodeId=${encodeURIComponent(episodeId)}`);
+        if (data.status !== 200 || !data.data) return { sub: true, dub: false, hindi: true };
+        const servers = data.data;
+        
+        return {
+            sub: servers.sub?.length > 0,
+            dub: servers.dub?.length > 0,
+            hindi: true
+        };
     } catch (error) {
-        console.error('[AniPocket] Error fetching servers:', error);
         return { sub: true, dub: false, hindi: true };
     }
 }

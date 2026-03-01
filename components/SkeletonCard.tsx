@@ -1,11 +1,11 @@
 export default function SkeletonCard() {
     return (
-        <div className="relative aspect-[3/4] bg-[#27272a] rounded-xl overflow-hidden mb-3 shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-white/5 animate-pulse">
+        <div className="relative aspect-[3/4] bg-[#1c1c28] rounded-xl overflow-hidden mb-3 shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-white/5 animate-pulse">
             {/* Card Image Skeleton */}
             <div className="absolute inset-0 bg-[#3f3f46]/30"></div>
 
             {/* Gradient Overlay Matching AnimeCard */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#18181b] via-[#18181b]/40 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#13131c] via-[#13131c]/40 to-transparent"></div>
 
             {/* Content Skeletons */}
             <div className="absolute bottom-0 left-0 right-0 p-3 pt-6 z-10 flex flex-col gap-2">

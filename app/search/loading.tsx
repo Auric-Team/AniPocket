@@ -12,8 +12,8 @@ export default function SearchLoading() {
                     </div>
                     <div className="flex items-center gap-3">
                         {/* Filter Buttons Skeleton */}
-                        <div className="h-10 w-24 bg-[#1e1e24] rounded-xl border border-white/5 animate-pulse"></div>
-                        <div className="h-10 w-24 bg-[#1e1e24] rounded-xl border border-white/5 animate-pulse"></div>
+                        <div className="h-10 w-24 bg-[#13131c] rounded-xl border border-white/5 animate-pulse"></div>
+                        <div className="h-10 w-24 bg-[#13131c] rounded-xl border border-white/5 animate-pulse"></div>
                     </div>
                 </div>
 
@@ -22,7 +22,7 @@ export default function SearchLoading() {
                     {Array.from({ length: 15 }).map((_, i) => (
                         <div key={i} className="animate-pulse" style={{ animationDelay: `${i * 50}ms` }}>
                             {/* Re-use the card UI directly to ensure grid mapping matches layout perfectly */}
-                            <div className="relative aspect-[3/4] bg-[#27272a] rounded-xl overflow-hidden mb-3 border border-white/5">
+                            <div className="relative aspect-[3/4] bg-[#1c1c28] rounded-xl overflow-hidden mb-3 border border-white/5">
                                 <div className="absolute inset-0 bg-[#3f3f46]/30"></div>
                             </div>
                             <div className="h-4 bg-[#52525b]/50 rounded w-3/4 mb-2"></div>

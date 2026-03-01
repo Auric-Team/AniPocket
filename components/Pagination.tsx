@@ -28,12 +28,12 @@ export default function Pagination({ currentPage, totalPages, hasNextPage }: Pag
             <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="w-10 h-10 rounded-full bg-[#242428] hover:bg-[var(--accent)] hover:text-black flex items-center justify-center text-white transition-colors disabled:opacity-50 disabled:hover:bg-[#242428] disabled:hover:text-white"
+                className="w-10 h-10 rounded-full bg-[#1a1a26] hover:bg-[var(--accent)] hover:text-black flex items-center justify-center text-white transition-colors disabled:opacity-50 disabled:hover:bg-[#1a1a26] disabled:hover:text-white"
             >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
 
-            <div className="flex items-center gap-2 px-4 py-2 bg-[#242428] rounded-full text-white font-semibold">
+            <div className="flex items-center gap-2 px-4 py-2 bg-[#1a1a26] rounded-full text-white font-semibold">
                 <span className="text-[var(--accent)]">{currentPage}</span>
                 <span className="text-[#888]">of</span>
                 <span>{totalPages}</span>
@@ -42,7 +42,7 @@ export default function Pagination({ currentPage, totalPages, hasNextPage }: Pag
             <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={!hasNextPage && currentPage >= totalPages}
-                className="w-10 h-10 rounded-full bg-[#242428] hover:bg-[var(--accent)] hover:text-black flex items-center justify-center text-white transition-colors disabled:opacity-50 disabled:hover:bg-[#242428] disabled:hover:text-white"
+                className="w-10 h-10 rounded-full bg-[#1a1a26] hover:bg-[var(--accent)] hover:text-black flex items-center justify-center text-white transition-colors disabled:opacity-50 disabled:hover:bg-[#1a1a26] disabled:hover:text-white"
             >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </button>

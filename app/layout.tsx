@@ -31,7 +31,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#0b0c0f',
+  themeColor: '#07070a',
 };
 
 export default function RootLayout({
@@ -46,7 +46,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://megaplay.buzz" />
         <link rel="preconnect" href="https://cors.eu.org" crossOrigin="anonymous" />
       </head>
-      <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans overflow-x-hidden selection:bg-[var(--accent)] selection:text-[#09090b]">
+      <body className="antialiased bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans overflow-x-hidden selection:bg-[var(--accent)] selection:text-[#0a0a0f]">
         {/* Cinematic Background */}
         <BackgroundEffects />
 

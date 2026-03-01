@@ -2,7 +2,7 @@ export default function Logo() {
     return (
         <div className="flex items-center gap-2 group">
             {/* The A Emblem */}
-            <div className="relative w-9 h-9 flex items-center justify-center bg-[#242428] rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] border border-[#ffffff14] overflow-hidden group-hover:scale-110 group-hover:border-[var(--accent)] transition-all duration-300">
+            <div className="relative w-9 h-9 flex items-center justify-center bg-[#1a1a26] rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.5)] border border-[#ffffff14] overflow-hidden group-hover:scale-110 group-hover:border-[var(--accent)] transition-all duration-300">
                 {/* Glow behind the A */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent)] to-[#ff8a00] opacity-20 group-hover:opacity-40 transition-opacity" />
 

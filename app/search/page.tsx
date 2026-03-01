@@ -67,8 +67,8 @@ export default async function SearchPage({
                                 />
                             </>
                         ) : (
-                            <div className="text-center py-24 bg-[#1e1e24] rounded-xl border border-white/5">
-                                <div className="w-16 h-16 mx-auto mb-4 bg-[#242428] rounded-full flex items-center justify-center shadow-inner">
+                            <div className="text-center py-24 bg-[#13131c] rounded-xl border border-white/5">
+                                <div className="w-16 h-16 mx-auto mb-4 bg-[#1a1a26] rounded-full flex items-center justify-center shadow-inner">
                                     <svg className="w-8 h-8 text-[#555]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>

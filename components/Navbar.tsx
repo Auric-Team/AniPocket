@@ -34,7 +34,7 @@ export default function Navbar() {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-[100] transition-colors duration-500 ${isScrolled ? 'bg-[#0b0c0f]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl' : 'bg-gradient-to-b from-[#09090b]/80 to-transparent'
+            className={`fixed top-0 left-0 right-0 z-[100] transition-colors duration-500 ${isScrolled ? 'bg-[#07070a]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl' : 'bg-gradient-to-b from-[#0a0a0f]/80 to-transparent'
                 }`}
         >
             <div className="container mx-auto px-4 max-w-[1400px]">
@@ -91,7 +91,7 @@ export default function Navbar() {
                         </Link>
 
                         <div className="flex items-center gap-3">
-                            <button className="hidden sm:block text-sm font-semibold text-white bg-[#2b2b31] hover:bg-[#3b3b42] px-4 py-2 rounded-lg transition-colors">
+                            <button className="hidden sm:block text-sm font-semibold text-white bg-[#222230] hover:bg-[#3b3b42] px-4 py-2 rounded-lg transition-colors">
                                 Login
                             </button>
                             <div className="w-8 h-8 rounded-full bg-[var(--accent)] cursor-pointer overflow-hidden flex items-center justify-center">
@@ -117,7 +117,7 @@ export default function Navbar() {
                             <Logo />
                             <button
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="p-2 text-[#aaaaaa] hover:text-white bg-[#2b2b31] rounded-full transition-colors"
+                                className="p-2 text-[#aaaaaa] hover:text-white bg-[#222230] rounded-full transition-colors"
                             >
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -135,7 +135,7 @@ export default function Navbar() {
                                             href={item.href}
                                             className={`px-4 py-3 rounded-xl text-[14px] font-semibold transition-all ${isActive
                                                 ? 'bg-[var(--accent)] text-[#111]'
-                                                : 'text-[#aaaaaa] hover:bg-[#2b2b31] hover:text-white'
+                                                : 'text-[#aaaaaa] hover:bg-[#222230] hover:text-white'
                                                 }`}
                                         >
                                             {item.name}

@@ -40,8 +40,8 @@ export default async function HomePage() {
     <div className="min-h-screen pb-16 bg-[var(--bg-primary)]">
       {/* Spotlight Slider */}
       <Suspense fallback={
-        <div className="w-full h-[50vh] md:h-[70vh] min-h-[400px] max-h-[700px] bg-[#0b0c0f] relative overflow-hidden flex items-center">
-          <div className="absolute inset-0 bg-[#1e1e24] animate-pulse" />
+        <div className="w-full h-[50vh] md:h-[70vh] min-h-[400px] max-h-[700px] bg-[#07070a] relative overflow-hidden flex items-center">
+          <div className="absolute inset-0 bg-[#13131c] animate-pulse" />
           <div className="container relative z-10 px-4">
             <div className="w-3/4 md:w-1/2 space-y-4">
               <div className="h-4 w-24 bg-[#333] rounded animate-pulse" />
@@ -78,7 +78,7 @@ export default async function HomePage() {
                 <h2 className="text-xl md:text-2xl font-bold text-[#f4f4f5] tracking-tight flex items-center gap-2 font-outfit">
                   Latest Episodes
                 </h2>
-                <Link href="/search?sort=latest" className="text-xs font-semibold uppercase text-[#a1a1aa] hover:text-[#FFB000] transition-colors">
+                <Link href="/search?sort=latest" className="text-xs font-semibold uppercase text-[#a1a1aa] hover:text-[#f43f5e] transition-colors">
                   View All
                 </Link>
               </div>

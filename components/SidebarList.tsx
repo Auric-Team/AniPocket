@@ -30,9 +30,9 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
                 </h2>
             </div>
 
-            <div className="bg-[#18181b] rounded-xl border border-white/5 overflow-hidden shadow-lg">
+            <div className="bg-[#13131c] rounded-xl border border-white/5 overflow-hidden shadow-lg">
                 <div className="flex border-b border-white/5">
-                    <button className="flex-1 py-3 text-sm font-bold text-[#FFB000] border-b-2 border-[#FFB000] bg-[#27272a]/50 transition-colors">Today</button>
+                    <button className="flex-1 py-3 text-sm font-bold text-[#f43f5e] border-b-2 border-[#f43f5e] bg-[#1c1c28]/50 transition-colors">Today</button>
                     <button className="flex-1 py-3 text-sm font-medium text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">Week</button>
                     <button className="flex-1 py-3 text-sm font-medium text-[#a1a1aa] hover:text-[#f4f4f5] transition-colors">Month</button>
                 </div>
@@ -61,7 +61,7 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
                             className="group flex flex-col md:flex-row items-center p-3 border-b border-white/5 last:border-0 hover:bg-[#ffffff05] transition-colors"
                         >
                             <div className="w-10 shrink-0 flex items-center justify-center mr-2">
-                                <span className={`text-2xl font-black font-outfit ${index === 0 ? 'text-[#FFB000]' :
+                                <span className={`text-2xl font-black font-outfit ${index === 0 ? 'text-[#f43f5e]' :
                                     index === 1 ? 'text-[#FF5E00]' :
                                         index === 2 ? 'text-[#e5c786]' : 'text-zinc-600'
                                     }`}>
@@ -71,7 +71,7 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
 
                             <div className="flex items-center w-full gap-3">
                                 {/* Thin Poster */}
-                                <div className="relative w-14 h-20 shrink-0 rounded-md bg-[#27272a] overflow-hidden shadow-sm">
+                                <div className="relative w-14 h-20 shrink-0 rounded-md bg-[#1c1c28] overflow-hidden shadow-sm">
                                     <Image
                                         src={anime.image}
                                         alt={anime.title}
@@ -83,7 +83,7 @@ export default function SidebarList({ title, animeList, viewAllLink }: SidebarLi
 
                                 {/* Stacked Meta Data */}
                                 <div className="flex flex-col min-w-0 flex-1 justify-center">
-                                    <h4 className="text-[15px] font-semibold text-[#f4f4f5] group-hover:text-[#FFB000] transition-colors line-clamp-2 leading-snug mb-1.5">
+                                    <h4 className="text-[15px] font-semibold text-[#f4f4f5] group-hover:text-[#f43f5e] transition-colors line-clamp-2 leading-snug mb-1.5">
                                         {anime.title}
                                     </h4>
 

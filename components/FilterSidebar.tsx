@@ -68,7 +68,7 @@ export default function FilterSidebar() {
     };
 
     return (
-        <form onSubmit={handleApply} className="bg-[#1e1e24] p-5 rounded-xl border border-white/5 space-y-6 lg:sticky lg:top-24">
+        <form onSubmit={handleApply} className="bg-[#13131c] p-5 rounded-xl border border-white/5 space-y-6 lg:sticky lg:top-24">
             <div>
                 <h2 className="text-xl font-bold text-white mb-4">Filters</h2>
                 <div className="h-[1px] w-full bg-white/10 mb-5" />
@@ -81,7 +81,7 @@ export default function FilterSidebar() {
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                     placeholder="Search anime..."
-                    className="w-full bg-[#0b0c0f] text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] border border-white/5 placeholder-[#555]"
+                    className="w-full bg-[#07070a] text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] border border-white/5 placeholder-[#555]"
                 />
             </div>
 
@@ -90,7 +90,7 @@ export default function FilterSidebar() {
                 <select
                     value={type}
                     onChange={(e) => setType(e.target.value)}
-                    className="w-full bg-[#0b0c0f] text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] border border-white/5 appearance-none"
+                    className="w-full bg-[#07070a] text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] border border-white/5 appearance-none"
                 >
                     <option value="">All Types</option>
                     {TYPES.map((t) => (
@@ -104,7 +104,7 @@ export default function FilterSidebar() {
                 <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full bg-[#0b0c0f] text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] border border-white/5 appearance-none"
+                    className="w-full bg-[#07070a] text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] border border-white/5 appearance-none"
                 >
                     <option value="">All Statuses</option>
                     {STATUSES.map((s) => (
@@ -118,7 +118,7 @@ export default function FilterSidebar() {
                 <select
                     value={sort}
                     onChange={(e) => setSort(e.target.value)}
-                    className="w-full bg-[#0b0c0f] text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] border border-white/5 appearance-none"
+                    className="w-full bg-[#07070a] text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] border border-white/5 appearance-none"
                 >
                     <option value="">Default sorting</option>
                     {SORTS.map((s) => (
@@ -137,7 +137,7 @@ export default function FilterSidebar() {
                 <button
                     type="button"
                     onClick={handleClear}
-                    className="flex-1 bg-[#242428] hover:bg-[#333] text-white font-semibold py-2.5 rounded-lg transition-colors border border-white/5"
+                    className="flex-1 bg-[#1a1a26] hover:bg-[#333] text-white font-semibold py-2.5 rounded-lg transition-colors border border-white/5"
                 >
                     Clear
                 </button>

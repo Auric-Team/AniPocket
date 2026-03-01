@@ -3,17 +3,17 @@
 /* ===== CSS Variables (Premium V3 Palette) ===== */
 :root {
   /* Profound Zinc Space */
-  --bg-primary: #09090b;
+  --bg-primary: #0a0a0f;
   /* zinc-950 */
-  --bg-secondary: #18181b;
+  --bg-secondary: #13131c;
   /* zinc-900 */
-  --bg-card: #27272a;
+  --bg-card: #1c1c28;
   /* zinc-800 */
   --bg-hover: #ffffff0a;
 
   /* Electric Brand Gradient */
-  --accent: #FFB000;
-  --accent-hover: #FFC033;
+  --accent: #f43f5e;
+  --accent-hover: #e11d48;
 
   /* Text */
   --text-primary: #f4f4f5;
@@ -105,15 +105,54 @@ body {
 
 /* ===== Custom Animations for "Impressive" Overhaul ===== */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.5s ease-out forwards;
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+.animate-slide-up { animation: slide-up 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+.animate-scale-in { animation: scale-in 0.4s ease-out forwards; }
+
+.skeleton {
+  background: linear-gradient(90deg, #1c1c28 25%, #27273a 50%, #1c1c28 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Glassmorphism Classes */
+.glass {
+  background: rgba(28, 28, 40, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-dark {
+  background: rgba(10, 10, 15, 0.8);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Premium Card Hover Effect */
+.premium-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(244, 63, 94, 0.1);
 }

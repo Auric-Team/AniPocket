@@ -1,0 +1,68 @@
+
+> anipocket@0.1.0 build
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\Abhi\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\package-lock.json
+
+▲ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 10.1s
+  Running TypeScript ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/10) ...
+  Generating static pages using 11 workers (2/10) 
+  Generating static pages using 11 workers (4/10) 
+(node:25652) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+  Generating static pages using 11 workers (7/10) 
+[AniPocket] Error fetching spotlight: Error [AxiosError]: Request failed with status code 500
+    at aD (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\OneDrive_Desktop_project_AniPocket_64739a19._.js:1:61403)
+    at IncomingMessage.<anonymous> (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\OneDrive_Desktop_project_AniPocket_64739a19._.js:3:12060)
+    at bK.request (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\OneDrive_Desktop_project_AniPocket_64739a19._.js:3:24456)
+    at async bR (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\OneDrive_Desktop_project_AniPocket_64739a19._.js:3:30101)
+    at async k (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\[root-of-the-server]__f60d16d6._.js:1:6080) {
+  isAxiosError: true,
+  code: 'ERR_BAD_RESPONSE',
+  config: [Object],
+  request: [ClientRequest],
+  response: [Object],
+  status: 500
+}
+[AniPocket] Error fetching trending: Error [AxiosError]: Request failed with status code 500
+    at aD (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\OneDrive_Desktop_project_AniPocket_64739a19._.js:1:61403)
+    at IncomingMessage.<anonymous> (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\OneDrive_Desktop_project_AniPocket_64739a19._.js:3:12060)
+    at bK.request (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\OneDrive_Desktop_project_AniPocket_64739a19._.js:3:24456)
+    at async bS (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\OneDrive_Desktop_project_AniPocket_64739a19._.js:3:30332)
+    at async k (C:\Users\Abhi\OneDrive\Desktop\project\AniPocket\.next\server\chunks\ssr\[root-of-the-server]__f60d16d6._.js:1:6080) {
+  isAxiosError: true,
+  code: 'ERR_BAD_RESPONSE',
+  config: [Object],
+  request: [ClientRequest],
+  response: [Object],
+  status: 500
+}
+✓ Generating static pages using 11 workers (10/10) in 8.8s
+  Finalizing page optimization ...
+
+Route (app)      Revalidate  Expire
+┌ ○ /                   10m      1y
+├ ○ /_not-found
+├ ƒ /anime/[id]
+├ ƒ /api/hindi
+├ ƒ /api/proxy
+├ ƒ /api/search
+├ ƒ /api/source
+├ ○ /player
+├ ƒ /search
+└ ƒ /watch/[id]
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

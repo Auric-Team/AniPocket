@@ -12,8 +12,8 @@ const STREAM_PROXIES = [
 ];
 
 const CORS_PROXIES = [
-    (url: string) => `https://vercel-proxy-kappa-nine.vercel.app/api/proxy?url=${encodeURIComponent(url)}`,
     (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    (url: string) => `https://cdn.4animo.xyz/proxy/?url=${encodeURIComponent(url)}`,
     (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
 ];
 

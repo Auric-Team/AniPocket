@@ -90,10 +90,10 @@ export default function LiveSearchBar() {
     return (
         <div ref={dropdownRef} className="relative w-full lg:w-[400px]">
             {/* Input Bar */}
-            <div className="flex items-center bg-[#2b2b31] rounded-full w-full h-10 px-4 group focus-within:ring-1 focus-within:ring-[#FFB000] focus-within:bg-[#18181b] transition-all duration-300 shadow-sm border border-transparent focus-within:border-white/5">
-                <span className={`mr-3 transition-colors ${isLoading ? 'text-[#FFB000] animate-pulse' : 'text-[#888]'}`}>
+            <div className="flex items-center bg-[#222230] rounded-full w-full h-10 px-4 group focus-within:ring-1 focus-within:ring-[#f43f5e] focus-within:bg-[#13131c] transition-all duration-300 shadow-sm border border-transparent focus-within:border-white/5">
+                <span className={`mr-3 transition-colors ${isLoading ? 'text-[#f43f5e] animate-pulse' : 'text-[#888]'}`}>
                     {isLoading ? (
-                        <div className="w-4 h-4 rounded-full border-2 border-t-[#FFB000] border-r-transparent border-b-[#FFB000] border-l-transparent animate-spin" />
+                        <div className="w-4 h-4 rounded-full border-2 border-t-[#f43f5e] border-r-transparent border-b-[#f43f5e] border-l-transparent animate-spin" />
                     ) : (
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -129,11 +129,11 @@ export default function LiveSearchBar() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-12 left-0 right-0 bg-[#18181b]/95 backdrop-blur-2xl border border-white/10 rounded-xl shadow-[0_30px_60px_rgba(0,0,0,0.8)] overflow-hidden z-[200]"
+                        className="absolute top-12 left-0 right-0 bg-[#13131c]/95 backdrop-blur-2xl border border-white/10 rounded-xl shadow-[0_30px_60px_rgba(0,0,0,0.8)] overflow-hidden z-[200]"
                     >
                         {isLoading && results.length === 0 ? (
                             <div className="p-4 text-center text-sm text-[#888] flex items-center justify-center gap-2">
-                                <div className="w-3 h-3 rounded-full border-2 border-t-[#FFB000] border-r-transparent border-b-[#FFB000] border-l-transparent animate-spin" />
+                                <div className="w-3 h-3 rounded-full border-2 border-t-[#f43f5e] border-r-transparent border-b-[#f43f5e] border-l-transparent animate-spin" />
                                 Searching database...
                             </div>
                         ) : results.length > 0 ? (
@@ -144,7 +144,7 @@ export default function LiveSearchBar() {
                                         href={`/watch/${anime.id}`}
                                         className="group flex items-center gap-3 p-3 hover:bg-[#ffffff0a] transition-colors border-b border-white/5 last:border-0"
                                     >
-                                        <div className="relative w-10 h-14 rounded overflow-hidden shrink-0 bg-[#27272a]">
+                                        <div className="relative w-10 h-14 rounded overflow-hidden shrink-0 bg-[#1c1c28]">
                                             <Image
                                                 src={anime.image}
                                                 alt={anime.title}
@@ -154,7 +154,7 @@ export default function LiveSearchBar() {
                                             />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="text-[13px] font-semibold text-[#f4f4f5] line-clamp-1 group-hover:text-[#FFB000] transition-colors">
+                                            <h4 className="text-[13px] font-semibold text-[#f4f4f5] line-clamp-1 group-hover:text-[#f43f5e] transition-colors">
                                                 {anime.title}
                                             </h4>
                                             <div className="flex items-center gap-2 mt-1.5 text-[11px] font-medium text-[#888]">
@@ -167,7 +167,7 @@ export default function LiveSearchBar() {
                                 ))}
                                 <Link
                                     href={`/search?keyword=${encodeURIComponent(query)}`}
-                                    className="p-3 text-center text-[12px] font-bold text-[#FFB000] hover:text-[#09090b] hover:bg-[#FFB000] transition-colors flex items-center justify-center gap-1 group"
+                                    className="p-3 text-center text-[12px] font-bold text-[#f43f5e] hover:text-[#0a0a0f] hover:bg-[#f43f5e] transition-colors flex items-center justify-center gap-1 group"
                                 >
                                     View All Results
                                     <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>

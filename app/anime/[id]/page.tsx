@@ -20,10 +20,10 @@ export default async function AnimeDetailsPage({
     }
 
     return (
-        <div className="min-h-screen bg-[#0b0c0f] pt-[60px] pb-12">
+        <div className="min-h-screen bg-[#07070a] pt-[60px] pb-12">
 
             {/* HiAnime specific Breadcrumb strip */}
-            <div className="w-full bg-[#1e1e24] py-2 border-b border-white/5 mb-6">
+            <div className="w-full bg-[#13131c] py-2 border-b border-white/5 mb-6">
                 <div className="container max-w-[1400px] mx-auto px-4">
                     <nav className="flex items-center gap-2 text-[13px] font-medium text-[#aaaaaa]">
                         <Link href="/" className="hover:text-[var(--accent)] transition-colors">Home</Link>
@@ -42,7 +42,7 @@ export default async function AnimeDetailsPage({
 
                     {/* Left Column: Poster & Actions */}
                     <div className="w-[200px] md:w-[250px] shrink-0 mx-auto md:mx-0">
-                        <div className="w-full relative aspect-[3/4] bg-[#242428] mb-4">
+                        <div className="w-full relative aspect-[3/4] bg-[#1a1a26] mb-4">
                             <Image
                                 src={anime.image || '/placeholder.jpg'}
                                 alt={anime.title}
@@ -90,7 +90,7 @@ export default async function AnimeDetailsPage({
                                     {anime.status && anime.status.includes('Finished') ? 'HD' : anime.status || 'HD'}
                                 </span>
 
-                                <span className="flex items-center gap-1 bg-[#242428]/90 font-bold rounded overflow-hidden">
+                                <span className="flex items-center gap-1 bg-[#1a1a26]/90 font-bold rounded overflow-hidden">
                                     {anime.episodes?.sub && (
                                         <span className="bg-[var(--badge-sub)] text-[#111] px-1.5 py-[2px] flex items-center text-[11px]">
                                             <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z" /></svg>
@@ -104,7 +104,7 @@ export default async function AnimeDetailsPage({
                                         </span>
                                     )}
                                     {anime.episodes?.hindi && (
-                                        <span className="bg-[#FFB000] text-[#111] px-1.5 py-[2px] flex items-center border-l border-black/10 text-[11px]">
+                                        <span className="bg-[#f43f5e] text-[#111] px-1.5 py-[2px] flex items-center border-l border-black/10 text-[11px]">
                                             <svg className="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" /><circle cx="12" cy="12" r="3" /></svg>
                                             {anime.episodes.hindi}
                                         </span>
@@ -148,11 +148,11 @@ export default async function AnimeDetailsPage({
                         </div>
 
                         {/* Episodes Section - if they scroll down */}
-                        <div className="bg-[#1e1e24] w-full flex flex-col h-[400px] border-t border-[#ffffff14]">
-                            <div className="p-3 border-b border-[#2b2b31] flex items-center justify-between">
+                        <div className="bg-[#13131c] w-full flex flex-col h-[400px] border-t border-[#ffffff14]">
+                            <div className="p-3 border-b border-[#222230] flex items-center justify-between">
                                 <h3 className="font-semibold text-white">Episodes List</h3>
                             </div>
-                            <div className="flex-1 overflow-hidden bg-[#242428]">
+                            <div className="flex-1 overflow-hidden bg-[#1a1a26]">
                                 <EpisodeList
                                     episodes={anime.episodeList}
                                     animeId={anime.id}

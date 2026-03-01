@@ -33,13 +33,13 @@ export default function TrendingList({ animeList }: TrendingListProps) {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => scroll('left')}
-                        className="w-10 h-10 rounded-full bg-[#18181b] hover:bg-[#FFB000] hover:text-[#09090b] flex items-center justify-center text-zinc-100 transition-all duration-300 border border-white/5 shadow-md"
+                        className="w-10 h-10 rounded-full bg-[#13131c] hover:bg-[#f43f5e] hover:text-[#0a0a0f] flex items-center justify-center text-zinc-100 transition-all duration-300 border border-white/5 shadow-md"
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                     </button>
                     <button
                         onClick={() => scroll('right')}
-                        className="w-10 h-10 rounded-full bg-[#18181b] hover:bg-[#FFB000] hover:text-[#09090b] flex items-center justify-center text-zinc-100 transition-all duration-300 border border-white/5 shadow-md"
+                        className="w-10 h-10 rounded-full bg-[#13131c] hover:bg-[#f43f5e] hover:text-[#0a0a0f] flex items-center justify-center text-zinc-100 transition-all duration-300 border border-white/5 shadow-md"
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                     </button>
@@ -49,12 +49,12 @@ export default function TrendingList({ animeList }: TrendingListProps) {
             <div className="relative group/slider">
                 {/* Scroll Buttons */}
                 <div className="absolute -left-4 top-1/2 -translate-y-1/2 z-40 opacity-0 group-hover/slider:opacity-100 transition-opacity hidden md:block">
-                    <button onClick={() => scroll('left')} className="w-12 h-12 bg-[#09090b]/80 hover:bg-[#FFB000] text-white hover:text-black rounded-full flex items-center justify-center backdrop-blur shadow-xl border border-white/10 transition-colors">
+                    <button onClick={() => scroll('left')} className="w-12 h-12 bg-[#0a0a0f]/80 hover:bg-[#f43f5e] text-white hover:text-black rounded-full flex items-center justify-center backdrop-blur shadow-xl border border-white/10 transition-colors">
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                     </button>
                 </div>
                 <div className="absolute -right-4 top-1/2 -translate-y-1/2 z-40 opacity-0 group-hover/slider:opacity-100 transition-opacity hidden md:block">
-                    <button onClick={() => scroll('right')} className="w-12 h-12 bg-[#09090b]/80 hover:bg-[#FFB000] text-white hover:text-black rounded-full flex items-center justify-center backdrop-blur shadow-xl border border-white/10 transition-colors">
+                    <button onClick={() => scroll('right')} className="w-12 h-12 bg-[#0a0a0f]/80 hover:bg-[#f43f5e] text-white hover:text-black rounded-full flex items-center justify-center backdrop-blur shadow-xl border border-white/10 transition-colors">
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                     </button>
                 </div>
@@ -88,7 +88,7 @@ export default function TrendingList({ animeList }: TrendingListProps) {
                             className="relative flex-shrink-0 w-[140px] md:w-[170px] snap-start group outline-none flex flex-col gap-3"
                         >
                             {/* Standard Clean Poster */}
-                            <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#27272a] shadow-lg group-hover:shadow-[0_8px_30px_rgba(255,176,0,0.15)] transition-all duration-300">
+                            <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#1c1c28] shadow-lg group-hover:shadow-[0_8px_30px_rgba(255,176,0,0.15)] transition-all duration-300">
                                 <Image
                                     src={anime.image}
                                     alt={anime.title}
@@ -98,13 +98,13 @@ export default function TrendingList({ animeList }: TrendingListProps) {
                                 />
 
                                 {/* Pure Gold Premium Rank Badge - Clean Top Left */}
-                                <div className="absolute top-0 left-0 bg-[#FFB000] text-[#09090b] font-black text-sm px-3.5 py-1 rounded-br-xl z-30 font-outfit shadow-md">
+                                <div className="absolute top-0 left-0 bg-[#f43f5e] text-[#0a0a0f] font-black text-sm px-3.5 py-1 rounded-br-xl z-30 font-outfit shadow-md">
                                     #{index + 1}
                                 </div>
 
                                 {/* Custom Play Button Overlay */}
                                 <div className="absolute inset-x-0 bottom-0 top-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 bg-black/40 backdrop-blur-[2px]">
-                                    <div className="w-12 h-12 bg-[#FFB000] text-[#09090b] rounded-full flex items-center justify-center scale-90 group-hover:scale-100 transition-transform duration-300 shadow-[0_4px_20px_rgba(255,176,0,0.4)]">
+                                    <div className="w-12 h-12 bg-[#f43f5e] text-[#0a0a0f] rounded-full flex items-center justify-center scale-90 group-hover:scale-100 transition-transform duration-300 shadow-[0_4px_20px_rgba(255,176,0,0.4)]">
                                         <svg className="w-5 h-5 ml-1 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                                     </div>
                                 </div>
@@ -112,13 +112,13 @@ export default function TrendingList({ animeList }: TrendingListProps) {
 
                             {/* Clean Text Box - Outside image for readability */}
                             <div className="px-1 flex flex-col gap-1">
-                                <h3 className="text-[14px] md:text-[15px] font-bold text-[#f4f4f5] line-clamp-2 leading-snug group-hover:text-[#FFB000] transition-colors duration-200">
+                                <h3 className="text-[14px] md:text-[15px] font-bold text-[#f4f4f5] line-clamp-2 leading-snug group-hover:text-[#f43f5e] transition-colors duration-200">
                                     {anime.title}
                                 </h3>
                                 <div className="flex flex-wrap items-center gap-2 text-[12px] font-medium text-[#a1a1aa]">
                                     <span>{anime.type || 'TV'}</span>
                                     <span className="w-1 h-1 rounded-full bg-[#52525b]" />
-                                    <span className="text-[#FFB000] font-semibold">HD</span>
+                                    <span className="text-[#f43f5e] font-semibold">HD</span>
                                 </div>
                             </div>
                         </MotionLink>
